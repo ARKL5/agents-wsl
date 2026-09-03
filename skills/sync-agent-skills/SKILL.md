@@ -1,23 +1,26 @@
 ---
 name: sync-agent-skills
-description: 把 ARK-skills 分发到两侧农场。仅用户点名。仅 WSL 有效。
+description: 管理当前 OS 的 .agents Git 仓库，并校验/同步共享 skills。仅用户点名。
 disable-model-invocation: true
 ---
 
 # Sync agent skills
 
-只在 WSL 点名有效。Windows 点名：告诉用户去 WSL 跑，不代跑。
+当前 OS 的 `~/.agents` 是本侧 Git 仓库，也是实际生效的 skills 工作树。WSL 与 Windows 各自维护自己的仓库；不从另一侧覆盖目录。
 
-工作副本路径以 `use-local-wsl` 为准（`/home/ark/CODE/ARK-skills`）。两侧 `~/.agents/skills` 只接收。
+## 日常同步
 
-## Sync
+1. 进入当前 OS 的 `~/.agents`。
+2. 检查工作树；有未提交修改就停止并报告。
+3. 执行 `git pull --ff-only`。
+4. 执行 `uv run tools/check.py`（Windows 可用本机 uv）。
 
-1. 工作副本 `git pull`
-2. `uv run /home/ark/CODE/ARK-skills/scripts/deploy.py`
-3. `uv run /home/ark/CODE/ARK-skills/scripts/hygiene.py`
+共享 skill 的 canonical 来源是 WSL 仓库。Windows 从 `ARKL5/agents-wsl` fetch，只 cherry-pick 审查过的 `shared(<skill>): ...` 提交；冲突立即停止，不 stash、不覆盖、不自动解决。
 
-任一步失败即停，把 stderr 给用户。
+共享集合见仓库根的 `shared-skills.txt`。共享提交只允许修改一个 `skills/<skill>/**` 与必要协议文件；平台专属 skill 不得混入。
 
-**完成：** pull 已完成；清单内目录已覆盖两侧农场；卫生（派生 yaml、Claude 映射、摘错误链接）已跑通，或已把失败输出给你。
+## 完成标准
 
-Create、收编、watch 上游见仓库 [`MAINTAIN.md`](/home/ark/CODE/ARK-skills/MAINTAIN.md)。禁止在农场 `mkdir`。
+工作树干净、pull 成功、校验通过；共享同步时还必须说明 fetch 的提交、路径审查结果和 cherry-pick 结果。
+
+不要运行旧 ARK-skills 的 `deploy.py`/`hygiene.py`，它们已停用；不要把 `.agents` 当作只接收目录。
