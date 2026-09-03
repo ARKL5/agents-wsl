@@ -15,9 +15,17 @@ disable-model-invocation: true
 3. 执行 `git pull --ff-only`。
 4. 执行 `uv run tools/check.py`（Windows 可用本机 uv）。
 
-共享 skill 的 canonical 来源是 WSL 仓库。Windows 从 `ARKL5/agents-wsl` fetch，只 cherry-pick 审查过的 `shared(<skill>): ...` 提交；冲突立即停止，不 stash、不覆盖、不自动解决。
-
 共享集合见仓库根的 `shared-skills.txt`。共享提交只允许修改一个 `skills/<skill>/**` 与必要协议文件；平台专属 skill 不得混入。
+
+## 共享同步（仅 Windows）
+
+共享 skill 的 canonical 来源是 WSL 仓库。
+
+1. `git fetch wsl`（remote 为 `ARKL5/agents-wsl`）。
+2. 列出尚未应用到本仓的 `shared(<skill>): ...` 提交。
+3. 审查每个提交的路径：只允许一个 `skills/<skill>/**` 与必要协议文件；混入平台专属 skill 则停止。
+4. 逐条 `git cherry-pick`；冲突立即停止，不 stash、不覆盖、不自动解决。已有相同变更则跳过。
+5. 再执行 `uv run tools/check.py`。
 
 ## 完成标准
 
