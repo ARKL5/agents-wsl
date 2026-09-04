@@ -6,12 +6,11 @@ Issues and specs for this repo live as markdown files in `.scratch/`.
 
 - Wayfinding lives in `.scratch/<effort>/` (map + decision tickets)
 - `to-spec` and `to-tickets` write a sibling directory `.scratch/<effort>-implement/`
-- Implementation issues are one file per ticket at `.scratch/<effort>-implement/issues/<NN>-<slug>.md`, numbered from `01`, never a single combined tickets file
 - `## Answer` is the resolve slot on a wayfinding ticket. `## Comments` is only appended conversation
 
 ## When a skill says "publish to the issue tracker"
 
-Create a new file under the matching directory (`.scratch/<effort>/` for wayfinding, `.scratch/<effort>-implement/` for spec and implementation tickets), creating it if needed.
+Follow the operations section that skill named. Create parent directories if needed.
 
 ## When a skill says "fetch the relevant ticket"
 
@@ -23,6 +22,13 @@ Used by `/to-spec`.
 
 - **Spec**: `.scratch/<effort>-implement/spec.md`. First line is the title (`# <name>`). Body sections: templates live in to-spec.
 - If the user named a write path, use it. If the source is a wayfinding map at `.scratch/<effort>/map.md` and they named no path, write `.scratch/<effort>-implement/spec.md`. If neither an effort nor a write path is known, ask.
+
+## Ticket operations
+
+Used by `/to-tickets`.
+
+- **Implementation ticket**: `.scratch/<effort>-implement/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first); skip numbers already used in that folder. One file per ticket, never a single combined file. First line is the title (`# <NN>: <name>`). Body fields: template lives in to-tickets.
+- If the user named a write path, use it as the directory for the per-ticket files. If an effort is known (the source is `.scratch/<effort>-implement/spec.md`, or this session already named the effort) and they named no path, write `.scratch/<effort>-implement/issues/`. If neither an effort nor a write path is known, ask.
 
 ## Wayfinding operations
 

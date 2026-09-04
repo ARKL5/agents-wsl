@@ -1,78 +1,77 @@
 ---
 name: to-tickets
-description: Slice already-settled bindings into tracer-bullet implementation tickets with blocking edges. Use when the human wants ticket files; the source is whatever they passed (a spec, a path, or this conversation).
+description: "Break a plan, spec, or the current conversation into tracer-bullet tickets, each declaring its blocking edges."
 disable-model-invocation: true
 ---
 
-Project the source into **tickets**: **tracer bullet** vertical slices, each declaring the tickets that **block** it. Tickets add session bounds and order; they do not compile a second contract.
+# To Tickets
 
-There must be a **source**. The human supplies it: a path, title, or URL, or this conversation. Do not classify the source. If they passed nothing and this conversation has no settled bindings, ask for a source. Do not search `.scratch` or `.notes`. Do not create `.scratch`. Do not compile a spec in this skill.
+Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
 
-**Write path.** If they named a write directory, use it. If the source path is a `spec.md` inside `.scratch/<effort>/`, write `issues/<NN>-<slug>.md` in that same effort (layout). `NN` starts from `01`; skip numbers already used in that folder. If the source is this conversation and they named no write directory, ask where to write.
+**Where the tickets physically live is tracker-specific.** Read `docs/agents/issue-tracker.md` "Ticket operations".
 
-If a source file has pointers, follow them to each binding's source file. Do not copy spec sections or decision Answer bodies onto the ticket. If ticket AC and the spec conflict, the spec wins.
+The source is this conversation, or a path or tracker reference the user passed. If they passed one, fetch it and follow its title links to the files that hold the bindings.
 
-```
-.scratch/<effort>/
-  map.md
-  spec.md
-  issues/
-    <NN>-<slug>.md
-```
-
-## Vertical slices
-
-Each slice cuts a narrow but complete path through every layer (schema, API, UI, tests): **vertical**, not a horizontal slice of one layer. A completed slice is demoable or verifiable on its own. **What to build** is the end-to-end behaviour this ticket makes work, not a layer-by-layer list.
-
-**Wide refactors** are the exception. A wide refactor is one mechanical change (rename a column, retype a shared symbol) whose blast radius fans across the whole codebase, so a single edit breaks thousands of call sites and no vertical slice can land green. Sequence it as **expand–contract**: expand (add the new form beside the old); migrate call sites in batches (each batch its own ticket blocked by the expand); contract (delete the old form in a ticket blocked by every migrate batch). When even the batches cannot stay green alone, they share an integration branch and all block a final integrate-and-verify ticket.
-
-Prefactoring that makes the change easy is a slice of its own and comes first when the human approves it. Do not explore the codebase as a required step.
+If a slice would need a binding the source does not have, **stop** and list the missing bindings.
 
 ## Process
 
-### 1. Load the source
+### 1. Explore the codebase (optional)
 
-Load what the human passed, or use this conversation. Follow planning pointers on it.
+If you have not already explored the codebase, do so to understand the current state of the code. Ticket titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
 
-**Done when** Outcome, Observable behavior, Acceptance, Out of scope, and Uses (if any) are in hand, or the human has been asked for a source.
+Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
 
-### 2. Draft slices
+### 2. Draft vertical slices
 
-Every spec acceptance criterion is owned by at least one ticket. Each ticket has What to build, a checklist implied by the spec, `Blocked by`, and `Uses *` as pointers this slice consumes.
+Break the work into **tracer bullet** tickets.
 
-**Done when** that coverage holds on the draft list.
+<vertical-slice-rules>
 
-### 3. Ask once
+- Each slice cuts a narrow but COMPLETE path through every layer (schema, API, UI, tests): vertical, NOT a horizontal slice of one layer
+- A completed slice is demoable or verifiable on its own
+- Each slice is sized to fit in a single context window
+- Any prefactoring should be done first
 
-Show a numbered list: title, Blocked by, Acceptance. Ask whether granularity, edges, merge/split are right. Iterate until the human approves.
+</vertical-slice-rules>
 
-**Done when** the human has approved the list.
+Give each ticket its **blocking edges**: the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
 
-### 4. Publish
+**Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change (rename a column, retype a shared symbol) whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket; green is promised only there.
 
-Write the approved tickets from the template. Blockers first so edges can use real titles. No `Type:` on implementation tickets. No upstream → `None`.
+### 3. Quiz the user
 
-A prototype snippet that encodes a locked decision more precisely than prose may sit inside What to build, trimmed to the decision-rich parts.
+Present the proposed breakdown as a numbered list. For each ticket, show:
 
-Report the paths and titles written. Leave the source file unchanged.
+- **Title**: short descriptive name
+- **Blocked by**: which other tickets (if any) must complete first
+- **What it delivers**: the end-to-end behaviour this ticket makes work
 
-**Done when** each approved slice exists at that path with the template fields filled, or the human has been asked where to write.
+Ask the user:
 
-<implementation-ticket-template>
+- Does the granularity feel right? (too coarse / too fine)
+- Are the blocking edges correct: does each ticket only depend on tickets that genuinely gate it?
+- Should any tickets be merged or split further?
 
-# <NN> — <title>
+Iterate until the user approves the breakdown.
 
-**Blocked by:** None | <upstream titles>
-**Uses decisions:** None | <upstream decision titles>
-**Uses research:** None | <upstream research titles>
-**Status:** ready-for-agent
+### 4. Publish the tickets
 
-## What to build
+Write the approved tickets using the template below, then publish them to the project issue tracker as the tracker specifies. Publish in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers.
 
-<this slice's observable increment; a trimmed prototype snippet may sit here>
+Leave the source unchanged.
 
-- [ ] <acceptance implied by the spec>
+<ticket-template>
 
-## Answer
+# <NN>: <Ticket title>
 
-</implementation-ticket-template>
+**What to build:** the end-to-end behaviour this ticket makes work, from the user's perspective, not a layer-by-layer implementation list.
+
+**Blocked by:** the numbers/titles of the tickets that gate this one, or "None (can start immediately)".
+
+- [ ] Acceptance criterion 1
+- [ ] Acceptance criterion 2
+
+</ticket-template>
+
+Avoid specific file paths or code snippets: they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it and note briefly that it came from a prototype. Trim to the decision-rich parts, not a working demo, just the important bits.
