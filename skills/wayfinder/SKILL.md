@@ -56,13 +56,13 @@ The whole map at low resolution, loaded once per session. Open tickets are **not
 
 Each ticket is a **child** of the map; the tracker supplies its identity. Its body is the question, sized to one 100K token agent session.
 
-Each ticket carries a type, one of `research`, `prototype`, `grilling`, `task` (see [Ticket Types](#ticket-types)).
+Each ticket carries a type, one of `research`, `prototype`, `grilling`, `task` (see **Ticket Types**).
 
 A session **claims** a ticket **first**, before any work, so concurrent sessions skip it.
 
 A ticket is **unblocked** when every ticket blocking it is closed; the **frontier** is the open, unblocked, unclaimed children, the edge of the known.
 
-The answer isn't part of the body; it's recorded on resolution (see [Work through the map](#work-through-the-map)). Assets created while resolving a ticket are linked from the ticket, not pasted in.
+The answer isn't part of the body; it's recorded on resolution (see **Work through the map**). Assets created while resolving a ticket are linked from the ticket, not pasted in.
 
 ## Ticket Types
 
