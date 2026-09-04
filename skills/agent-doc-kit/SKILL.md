@@ -1,20 +1,20 @@
 ---
 name: agent-doc-kit
-description: 对点名的 context 面按本体审计或改写。
+description: 对点名的 context 面按五条审计或改写。
 disable-model-invocation: true
 ---
 
 # agent-doc-kit
 
-kit 是本体。交付是对用户点名的那一个 context 面，按 [`philosophy/00.md`](philosophy/00.md) 审计或改写。
+kit 持有 00 的五条。交付是对用户点名的那一个 context 面，按 [`philosophy/00.md`](philosophy/00.md) 审计或改写。
 
 写作工艺 → skill `writing-for-agents`（改 `SKILL.md` 或协议文档时加载）。
 
 ## 何时用
 
-用户点名了一个属于 00 闭集的面，要它与本体对齐。
+用户点名了一个属于 00 闭集的面，要它与五条对齐。
 
-模式：`audit` / `reshape` / `bootstrap`。`bootstrap` 仅产品仓索引与残差落点。
+模式：`audit` / `reshape` / `bootstrap`。`bootstrap` 仅产品仓 index 与 residue 落点。
 
 ## 流程
 
@@ -24,7 +24,7 @@ kit 是本体。交付是对用户点名的那一个 context 面，按 [`philoso
 
 完成：用户认可路径、面、模式。
 
-### 2. 加载本体
+### 2. 加载 00
 
 读 [`philosophy/00.md`](philosophy/00.md)。
 
@@ -34,11 +34,11 @@ kit 是本体。交付是对用户点名的那一个 context 面，按 [`philoso
 
 只读。用该面事实，不用 00 的表冒充现实。
 
-完成：十行内写出已有材料、它现在是索引/残差/主文档、与本体的裂缝。
+完成：十行内写出已有材料、它现在是 index / residue / 主文档、与五条的裂缝。
 
 ### 4. 对照表
 
-逐条对照五条。检查复述、索引在讲行为、残差在做路径导览、环境能坦白却仍抄了、空文件充活约束、在调度别的 skill。
+逐条对照五条。检查复述、index 在讲行为、residue 在做路径导览、环境能坦白却仍抄了、空文件充活约束、在调度别的 skill。
 
 `audit` 到对照表为止。00 表不允许写盘的面，停在对照表。
 
@@ -62,7 +62,7 @@ kit 是本体。交付是对用户点名的那一个 context 面，按 [`philoso
 
 完成：自检全过或残留已列出。
 
-## 改本体
+## 改 00
 
 改 [`philosophy/00.md`](philosophy/00.md) 或 [`shapes/`](shapes/)。
 
