@@ -1,82 +1,51 @@
 ---
 name: to-spec
-description: Compile already-settled bindings into one observable spec. Use when the human wants a spec file; the source is whatever they passed (a map, a path, or this conversation).
+description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed."
 disable-model-invocation: true
 ---
 
-Compile already-settled bindings into one loadable **spec**: an observable contract. Do not interview. Do not start a grilling round. The spec is a projection, not a restatement of answers.
+This skill takes the current conversation context and codebase understanding and produces a spec. Synthesize what you already know.
 
-There must be a **source**. The human supplies it: a path, title, or URL, or this conversation. Do not classify the source. If they passed nothing and this conversation has no settled bindings, ask for a source. Do not search `.scratch` or `.notes`. Do not create `.scratch`.
+**Where the spec physically lives is tracker-specific.** Read `docs/agents/issue-tracker.md` "Spec operations".
 
-**Write path.** If they named a write path, use it. If the source path is a `map.md`, write `spec.md` in that same directory (layout, not classification). If the source is this conversation and they named no write path, ask where to write.
+The source is this conversation, or a path or tracker reference the user passed. If they passed one, fetch it and follow its title links to the files that hold the bindings.
 
-If a source file has pointers (`Uses decisions`, title links, ADRs, glossary), follow them to each binding's source file before compiling. Do not re-plan.
-
-If you cannot write checkable acceptance for every observable behavior, **stop**. List the missing bindings. Wait. Do not name other skills.
-
-```
-.scratch/<effort>/
-  map.md
-  spec.md
-  issues/
-    <NN>-<slug>.md
-```
-
-Write only the sections in the template. Copy `Effort state` from the map header only when writing into a directory that already has that map.
+Publish only when every observable behavior has checkable acceptance. Otherwise **stop** and list the missing bindings.
 
 ## Process
 
-### 1. Load the source
+1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
 
-Load what the human passed, or use this conversation. Follow planning pointers on it.
+2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
 
-**Done when** the source is in hand, or the human has been asked for one.
+Check with the user that these seams match their expectations. Seams choose where to test. If a seam answer would redraw observable behavior or out of scope, **stop** and list that as missing.
 
-### 2. Compile
-
-**Uses decisions** is an index of title links — gist nothing a ticket already holds. **Outcome** is one or two lines. **Observable behavior** is the compiled contract: what an observer sees when the outcome holds. **Acceptance** is checkable sentences derived from those behaviors. Every behavior gets at least one; a behavior with no checkable sentence is missing — stop, do not publish. **Out of scope** is what the source already ruled out.
-
-**Testing seams.** If the source already has seams, write them; do not ask. If it has none, ask **once** (prefer existing seams, highest, as few as possible; the ideal number is one). If the human omits, omit the section. Seams only choose where to test. If a seam answer would redraw the outcome, observable behavior, or out of scope, stop and list that as missing — do not publish.
-
-A prototype snippet that encodes a locked decision more precisely than prose (state machine, reducer, schema, type shape) may sit inside Observable behavior, trimmed to the decision-rich parts.
-
-**Done when** every behavior has checkable acceptance, Testing seams is written or omitted, and the spec introduces no new product forks — or the run has stopped with missing bindings listed.
-
-### 3. Publish
-
-Write `spec.md` at the write path.
-
-**Done when** that file exists with the sections above, or the human has been asked where to write.
+3. Write the spec using the template below, then publish it to the project issue tracker as the tracker specifies.
 
 <spec-template>
 
 # <title>
 
-Effort state: active
-
-## Uses decisions
-
-- [<decision title>](link)
-
-## Outcome
-
-<one or two lines>
-
 ## Observable behavior
 
-<the compiled contract>
+<what an observer sees when the work is done>
 
 ## Acceptance
 
-- [ ] <checkable sentence derived from an observable behavior>
+- [ ] <checkable sentence derived from an observable behavior; at least one per behavior>
 
 ## Out of scope
 
-<ruled beyond the outcome>
+<what the source already ruled out>
 
 ## Testing seams
 
-<where this feature is tested; omit this section when there are none>
+<the seams confirmed in step 2>
 
 </spec-template>
 
+Write only the sections in the template.
+
+Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
+
+Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it under **Observable behavior** and note briefly that it came from a prototype. Trim to the decision-rich parts, not a working demo, just the important bits.
