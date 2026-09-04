@@ -9,33 +9,9 @@ Actively build and sharpen the project's domain model as you design. This is the
 
 ## File structure
 
-Most repos have a single context:
+Single context: `CONTEXT.md` at the repo root, ADRs in `docs/adr/`.
 
-```
-/
-├── CONTEXT.md
-├── docs/
-│   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
-└── src/
-```
-
-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
-
-```
-/
-├── CONTEXT-MAP.md
-├── docs/
-│   └── adr/                          ← system-wide decisions
-├── src/
-│   ├── ordering/
-│   │   ├── CONTEXT.md
-│   │   └── docs/adr/                 ← context-specific decisions
-│   └── billing/
-│       ├── CONTEXT.md
-│       └── docs/adr/
-```
+Multiple contexts: a root `CONTEXT-MAP.md` points to each context's `CONTEXT.md`. ADRs live in that context's `docs/adr/`, or in the root `docs/adr/` when the decision is system-wide.
 
 Create files lazily: only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
 
@@ -47,7 +23,7 @@ When the user uses a term that conflicts with the existing language in `CONTEXT.
 
 ### Sharpen fuzzy language
 
-When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account': do you mean the Customer or the User? Those are different things."
+When the user uses vague or overloaded terms, propose a precise canonical term. The canonical term is the identifier already in the code (or the identifier you will add). "You're saying 'account': do you mean the Customer or the User? Those are different things."
 
 ### Discuss concrete scenarios
 
@@ -68,7 +44,7 @@ When a term is resolved, update `CONTEXT.md` right there. Don't batch these up: 
 Only offer to create an ADR when all three are true:
 
 1. **Hard to reverse**: the cost of changing your mind later is meaningful
-2. **Surprising without context**: a future reader will wonder "why did they do it this way?"
+2. **Surprising without context**: a future reader will wonder "why did they do it this way?"; an agent will treat the code as a smell and rewrite it
 3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
 
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md). Each ADR includes a `Code` pointer to the symbol or path that embodies the decision.
