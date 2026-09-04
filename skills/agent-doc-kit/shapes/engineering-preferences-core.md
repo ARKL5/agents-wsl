@@ -4,7 +4,7 @@
 
 **现行行为认（本仓须填）。**
 
-词 → [`CONTEXT.md`](CONTEXT.md)。ADR / claims 仅当仓内确有难逆取舍或外发声称。
+词 → [`CONTEXT.md`](CONTEXT.md)。ADR 仅当仓内确有难逆取舍。
 
 ## 小改默认
 
