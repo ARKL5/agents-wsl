@@ -45,7 +45,7 @@ When a fetch tool reports SSRF / private IP in `198.18.0.0/15`:
 
 ## Verification order
 
-1. 跑 `scripts/discover-proxy.sh`（URL/端口 + Windows Listen）。  
+1. 跑 `scripts/discover-proxy.sh`（URL/端口 + Windows Listen）。对本机对照合同巡检步1–3 用 `scripts/audit-live-check.sh`（会调用本脚本）。  
 2. 目标进程环境或专属配置层。  
 3. 做一次有范围的请求并观察是否经代理（例如 curl 的 peer 地址）。
 4. 若工具报 `198.18` SSRF：走上面的 Fake-IP 顺序，不要先改 `no_proxy` 或 TUN。
