@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "Review committed changes since a supplied fixed point along two axes: Standards (this repo's coding standards plus Fowler smells) and Spec (the ticket, spec, or notes path the caller passed). Use when reviewing since a commit, branch, or tag."
+description: "Review committed changes since a supplied fixed point along two axes: Standards (this repo's documented coding standards) and Spec (the path the caller passed). Use when reviewing since a commit, branch, or tag."
 ---
 
 Two-axis review of the diff between `HEAD` and a fixed point the caller supplies:
@@ -22,11 +22,7 @@ Before going further, confirm the fixed point resolves (`git rev-parse <fixed-po
 
 ### 2. Identify the spec source
 
-The Spec axis is the path the caller passed. If they did not pass one, skip the **Spec** sub-agent and report "no spec path supplied".
-
-If that file has **What to build**, requirements are that section and the untitled checklist after it. Remaining spec acceptance that file does not own is not missing. If the path is under `.scratch/<effort>/issues/`, also pass that effort's `spec.md` **Out of scope** as a bound (conflict: spec wins).
-
-Otherwise the whole loaded file is the ask.
+The Spec axis is the path the caller passed. If they did not pass one, skip this axis.
 
 ### 3. Identify the standards source
 
@@ -54,24 +50,33 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 ### 4. Spawn both sub-agents in parallel
 
-Each sub-agent performs its review directly. It does not invoke `code-review` or spawn further agents.
+Each sub-agent performs the review directly. It does not invoke `code-review` or spawn further agents.
 
 **Standards sub-agent prompt** should include:
 
 - The full diff command and commit list.
 - The repo's documented coding standards when they exist, **plus the smell baseline from step 3** pasted in full (the sub-agent has no other access to it). If the repo has none, the baseline only.
-- The brief: "Report, per file/hunk where relevant, (a) every place the diff violates a documented standard: cite the standard; and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations from judgement calls: documented-standard breaches can be hard, but baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Skip anything tooling enforces. Perform this review directly in this sub-agent; do not invoke code-review or spawn additional agents. Under 400 words."
+- The brief: "Report, per file/hunk where relevant, (a) every place the diff violates a documented standard: cite the standard (file + the rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations from judgement calls: documented-standard breaches can be hard, but baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Skip anything tooling enforces. Perform this review directly in this sub-agent; do not invoke code-review or spawn additional agents. Under 400 words."
 
 **Spec sub-agent prompt** should include:
 
 - The diff command and commit list.
-- The path and contents of the file from step 2. If that path is under `.scratch/<effort>/issues/`, also that effort's `spec.md` Out of scope.
-- The brief: "Requirements are What to build and the untitled checklist after it when those exist; otherwise the whole document. When the path is under `.scratch/<effort>/issues/`, treat that effort's `spec.md` Out of scope as a bound; spec wins on conflict. Other spec acceptance this file does not own is not missing. Report: (a) requirements missing or partial; (b) behaviour in the diff that wasn't asked for, including anything in Out of scope; (c) requirements that look implemented but where the implementation looks wrong. Quote the source line (or Out of scope line) for each finding. Perform this review directly in this sub-agent; do not invoke code-review or spawn additional agents. Under 400 words."
+- The path and contents of the file from step 2.
+- The brief: "Requirements are What to build and the untitled checklist after it when those exist; otherwise the whole document. Report: (a) requirements missing or partial; (b) behaviour in the diff that wasn't asked for; (c) requirements that look implemented but where the implementation looks wrong. Quote the source line for each finding. Perform this review directly in this sub-agent; do not invoke code-review or spawn additional agents. Under 400 words."
 
 If no spec path was supplied, skip the Spec sub-agent and note this in the final report.
 
 ### 5. Aggregate
 
-Open with a short summary of the diff. Then present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings.
+Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings, because the two axes are deliberately separate (see _Why two axes_).
 
-End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes.
+End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
+
+## Why two axes
+
+A change can pass one axis and fail the other:
+
+- Code that follows every standard but implements the wrong thing → **Standards pass, Spec fail.**
+- Code that does exactly what the path asked but breaks the project's conventions → **Spec pass, Standards fail.**
+
+Reporting them separately stops one axis from masking the other.
