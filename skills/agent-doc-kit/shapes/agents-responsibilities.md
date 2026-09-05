@@ -6,12 +6,12 @@
 
 ## Required reading
 
-**编码标准与门禁** → [`docs/agents/engineering-preferences.md`](docs/agents/engineering-preferences.md)
+**工程标准**（代码或设计，动手前读完）：[`docs/agents/engineering-standards.md`](docs/agents/engineering-standards.md)
 
-**领域词** → [`CONTEXT.md`](CONTEXT.md)
+**领域词**（用领域名之前读完）：[`CONTEXT.md`](CONTEXT.md)
 
-**ADRs** → [`docs/adr/`](docs/adr/)
+**ADRs**（动手前读已有取舍）：[`docs/adr/`](docs/adr/)
 
-**工作记忆** → `.scratch/`（写 map / spec / ticket 时）
+**工作记忆**（写 map / spec / ticket 时）：`.scratch/`
 
-`CLAUDE.md` 若存在：只指向本文件。
+**临时文件**（草稿、调研、一次性产出）：`.notes/`
