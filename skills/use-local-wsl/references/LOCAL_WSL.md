@@ -9,9 +9,8 @@
 | Linux user | `ark` |
 | Linux home | `/home/ark` |
 | Main code root | `/home/ark/CODE` |
-| Skills 工作副本 | `/home/ark/CODE/ARK-skills`（编辑真相源；仅此一份） |
-| Skills 农场 | `/home/ark/.agents/skills`（只接收） |
-| Windows Skills 农场 | `/mnt/c/Users/38993/.agents/skills`（同一份 deploy 写入） |
+| Skills 本侧工作树 | `/home/ark/.agents` |
+| Skills Windows 工作树 | `/mnt/c/Users/38993/.agents` |
 
 **WSL/Windows/Ubuntu 版本号、CPU/内存/swap 现查**，不在本文件维护：
 
