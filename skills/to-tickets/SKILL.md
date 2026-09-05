@@ -8,9 +8,9 @@ disable-model-invocation: true
 
 Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
 
-**Where the tickets physically live is tracker-specific.** Read `docs/agents/issue-tracker.md` "Ticket operations".
+**Where the tickets physically live.** Read [ticket-operations.md](ticket-operations.md).
 
-The source is this conversation, or a path or tracker reference the user passed. If they passed one, fetch it and follow its title links to the files that hold the bindings.
+The source is this conversation, or a path the user passed. If they passed one, fetch it and follow its title links to the files that hold the bindings.
 
 If a slice would need a binding the source does not have, **stop** and list the missing bindings.
 
@@ -57,7 +57,7 @@ Iterate until the user approves the breakdown.
 
 ### 4. Publish the tickets
 
-Write the approved tickets using the template below, then publish them to the project issue tracker as the tracker specifies. Publish in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers.
+Write the approved tickets using the template below, then publish them as ticket-operations.md specifies. Publish in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers.
 
 Leave the source unchanged.
 

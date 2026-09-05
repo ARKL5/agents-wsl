@@ -1,10 +1,10 @@
 ---
 name: wayfinder
-description: Plan a huge chunk of work (more than one agent session can hold) as a shared map of decision tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear.
+description: Plan a huge chunk of work (more than one agent session can hold) as a shared map of decision tickets, and resolve them one at a time until the way to the destination is clear.
 disable-model-invocation: true
 ---
 
-A loose idea has arrived, too big for one agent session, and wrapped in fog: the way from here to the **destination** isn't visible yet. Wayfinding is about finding that way, not charging at the destination. This skill charts the way as a **shared map** on the repo's issue tracker, then works its **decision tickets** (questions whose resolution is a decision, not slices of a build to execute) one at a time until the route is clear.
+A loose idea has arrived, too big for one agent session, and wrapped in fog: the way from here to the **destination** isn't visible yet. Wayfinding is about finding that way, not charging at the destination. This skill charts the way as a **shared map**, then works its **decision tickets** (questions whose resolution is a decision, not slices of a build to execute) one at a time until the route is clear.
 
 The destination varies per effort, and naming it is the first act of charting: it shapes every ticket. It might be a spec to hand off and iterate on, a decision to lock before planning starts, or a change made in place like a data-structure migration. The map is domain-agnostic: engineering work, course content, whatever fits the shape.
 
@@ -22,7 +22,7 @@ The map is the canonical artifact. Its tickets are children of the map.
 
 The map is an **index**, not a store. It lists the decisions made and points at the tickets that hold their detail; a decision lives in exactly one place, its ticket, so the map never restates it, only gists it and links.
 
-**Where the map, its child tickets, blocking, and frontier queries physically live is tracker-specific.** Read `docs/agents/issue-tracker.md` "Wayfinding operations".
+**Where the map, its child tickets, blocking, and frontier queries physically live.** Read [wayfinding.md](wayfinding.md).
 
 ### The map body
 
@@ -54,7 +54,7 @@ The whole map at low resolution, loaded once per session. Open tickets are **not
 
 ### Tickets
 
-Each ticket is a **child** of the map; the tracker supplies its identity. Its body is the question, sized to one 100K token agent session.
+Each ticket is a **child** of the map; wayfinding.md supplies its identity. Its body is the question, sized to one 100K token agent session.
 
 Each ticket carries a type, one of `research`, `prototype`, `grilling`, `task` (see **Ticket Types**).
 
@@ -105,9 +105,9 @@ User invokes with a loose idea.
 
 1. **Name the destination.** Call the Skill tool twice, for "grilling" and "domain-modeling", to pin down what this map is finding its way to: the spec, decision, or change. The destination fixes the scope, so it's settled first.
 2. **Map the frontier.** Grill again, **breadth-first** this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions. **If this surfaces no fog** (the way to the destination is already clear, the whole journey small enough for one session), you don't need a map. Stop and ask the user how they'd like to proceed.
-3. **Create the map** as the tracker specifies: Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
-4. **Create the tickets that pass Fog or ticket?** as the tracker specifies, then wire blocking edges in a **second pass** (tickets need identities before they can reference each other). Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog: the **Not yet specified** section.
-5. **Fire the research subagents.** For each `research` ticket you just created, spin up a subagent that calls the Skill tool with "research" and resolves the ticket as the tracker specifies, in parallel.
+3. **Create the map** as wayfinding.md specifies: Destination and Notes filled in, Decisions-so-far empty, the fog sketched into **Not yet specified**.
+4. **Create the tickets that pass Fog or ticket?** as wayfinding.md specifies, then wire blocking edges in a **second pass** (tickets need identities before they can reference each other). Wiring sorts them into the frontier and the blocked; everything you can't yet specify stays in the fog: the **Not yet specified** section.
+5. **Fire the research subagents.** For each `research` ticket you just created, spin up a subagent that calls the Skill tool with "research" and resolves the ticket as wayfinding.md specifies, in parallel.
 6. Stop: charting is one session's work; it hand-resolves nothing.
 
 ### Work through the map
@@ -115,10 +115,10 @@ User invokes with a loose idea.
 User invokes with a map. A ticket is **optional**: without one, you pick the next decision, not the user.
 
 1. Load the **map**: the low-res view, not every ticket body.
-2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it** as the tracker specifies, before any work.
-3. **Read related tickets.** Load the full body of every ticket this one is blocked by, and of every closed ticket whose Decisions-so-far gist this question would reopen. Done when each of those bodies has been read in full. If this question restates a settled decision, point at that ticket and **close** this one as a restatement, as the tracker specifies, and stop.
+2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it** as wayfinding.md specifies, before any work.
+3. **Read related tickets.** Load the full body of every ticket this one is blocked by, and of every closed ticket whose Decisions-so-far gist this question would reopen. Done when each of those bodies has been read in full. If this question restates a settled decision, point at that ticket and **close** this one as a restatement, as wayfinding.md specifies, and stop.
 4. Resolve it. Call the Skill tool for whichever skills the `## Notes` block names. If in doubt, call the Skill tool twice, for "grilling" and "domain-modeling".
-5. Record the resolution as the tracker specifies.
+5. Record the resolution as wayfinding.md specifies.
 6. Add newly-surfaced tickets that pass **Fog or ticket?** (create-then-wire); graduate any fog the answer has made specifiable, clearing each graduated patch from **Not yet specified** so it lives only as its new ticket. If the answer reveals that a ticket (this one or another) sits beyond the destination, **rule it out of scope** rather than resolving it on the route. If the decision invalidates other parts of the map, update or delete those tickets.
 
-The user may run unblocked tickets in parallel, so expect other sessions to be editing the tracker concurrently.
+The user may run unblocked tickets in parallel, so expect other sessions to be editing these files concurrently.
