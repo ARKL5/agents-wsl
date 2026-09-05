@@ -27,6 +27,7 @@ Done when each in-scope file is read and this run follows those files plus the h
 - Open URLs/files with `wslview` (BROWSER_ROUTING).
 - Docker identity: LOCAL_WSL. Egress layers and `no_proxy`: NETWORK_PROXY.
 - Runtimes, uv, nvm, agent CLIs, global npm: INSTALL_POLICY.
+- 本侧工作树是 `/home/ark/.agents`；各 agent 从 `/home/ark/.agents/skills` 加载 skill。
 - Back up `.wslconfig` / `wsl.conf` before edits. Distro restart only when the user authorizes interruption.
 
 Finish only after the command ran in the intended environment, paths resolved there, and state was verified with live checks (not skill-cached versions).
