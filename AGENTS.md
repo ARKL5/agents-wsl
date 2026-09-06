@@ -6,7 +6,7 @@
 
 ## Required reading
 
-**改或同步本仓**（动手前）：skill `sync-agent-skills`
+**改、同步或装外部 skill**（动手前）：skill `sync-agent-skills`
 
 **写 skill 或本文件**（改这些文件时）：skill `writing-for-agents`
 
