@@ -34,11 +34,8 @@ disable-model-invocation: true
 
 ## 同步
 
-在本侧 `~/.agents`：
+在本侧 `~/.agents` 跑 `uv run tools/sync.py`。
 
-1. 报告工作区改动，不因此停下。
-2. `git pull --ff-only`。Git 因本地改动拒绝则记下，继续还能做的。
-3. Windows：`git fetch wsl`（remote `ARKL5/agents-wsl`）。列出尚未收下的 `shared(<skill>): ...`。每条先看路径：只含一个共享 skill 与必要协议文件则 `git cherry-pick`；混入平台专属则跳过该条并报告；已有相同变更则跳过。冲突停在那一条，留给人，并列出其余未挑的。
-4. `uv run tools/check.py`。
+脚本自动检查工作区、执行 `git pull --ff-only`、拉取 WSL 提交并自动筛选 cherry-pick 属于 `shared-skills.txt` 的变更，最后跑 `tools/check.py` 校验。
 
-完成：pull、已收下的 shared 提交、跳过与冲突、校验、仍脏的文件，都能从报告对上。
+完成：以脚本输出为准，报告 pull 状态、已收下的 shared 提交、跳过/冲突情况与 check 校验结果。
