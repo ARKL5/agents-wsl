@@ -13,13 +13,15 @@ disable-model-invocation: true
 
 ## 更新
 
-安装根在身份文件。默认两侧；只点名一侧则只跑那侧。`-Version` / `-Force` 只给点名的一侧；未点名则两侧 latest，点了 `-Force` 则两侧都传。
+跑本 skill 的 `scripts/update.ps1`。脚本自动探测本地 mixed 代理并设置环境变量，依次调用 CPA 与 Keeper 的更新脚本执行 checksum 校验、二进制替换、健康检查与回滚。
 
-同一 PowerShell 进程跑安装根里的 `update.ps1`。脚本自己做 checksum、换二进制、回滚和健康检查。`curl.exe` 不继承 WinINet：访问 GitHub 需要代理时，现查 mixed/HTTP 监听，同进程设 `HTTP_PROXY` / `HTTPS_PROXY` / `ALL_PROXY`；没在听则停。
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File skills/cli-proxy-api/scripts/update.ps1 [-Target all|cpa|keeper] [-Version <v>] [-Force]
+```
 
-任务或二进制缺失：该侧报告，不重建。退出码非零看是否已回滚；`-Force` 只在用户点名时传。一侧失败不阻断另一侧。Keeper `.env` 只报 `<redacted>`。以脚本输出为准；`LastTaskResult=267009` 表示任务仍在跑。
+参数按需传递（默认两侧 latest）。以脚本汇总输出为准。
 
-完成：用户能判断每一侧是否成功以及服务是否可用。
+完成：报告两侧版本及服务健康状态（HTTP 200）。
 
 ## 接入
 
