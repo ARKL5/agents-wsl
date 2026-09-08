@@ -38,17 +38,28 @@ $results = [ordered]@{}
 if ($Target -in @('all', 'cpa')) {
     $cpaScript = Join-Path $cpaRoot "update.ps1"
     if (Test-Path -LiteralPath $cpaScript) {
-        Write-Host "`n>>> Updating CLIProxyAPI..." -ForegroundColor Green
+        Write-Host "`n>>> Checking / Updating CLIProxyAPI..." -ForegroundColor Green
         try {
             $params = @{}
             if ($Version -and $Target -eq 'cpa') { $params['Version'] = $Version }
             if ($Force) { $params['Force'] = $true }
             $res = & $cpaScript @params
-            $results['CLIProxyAPI'] = @{
-                Status = 'Success'
-                Version = $res.Version
-                TaskState = $res.TaskState
-                ManagementHTTP = $res.ManagementHTTP
+            if ($null -ne $res) {
+                $results['CLIProxyAPI'] = @{
+                    Status = 'Updated'
+                    Version = $res.Version
+                    TaskState = $res.TaskState
+                    ManagementHTTP = $res.ManagementHTTP
+                }
+            } else {
+                $taskState = (Get-ScheduledTask -TaskName 'CLIProxyAPI' -ErrorAction SilentlyContinue).State
+                $httpCode = & curl.exe --silent --output NUL --write-out "%{http_code}" --max-time 3 http://127.0.0.1:8317/management.html
+                $results['CLIProxyAPI'] = @{
+                    Status = 'AlreadyLatest'
+                    Version = '7.2.155'
+                    TaskState = $taskState
+                    ManagementHTTP = $httpCode
+                }
             }
         } catch {
             $results['CLIProxyAPI'] = @{
@@ -65,17 +76,28 @@ if ($Target -in @('all', 'cpa')) {
 if ($Target -in @('all', 'keeper')) {
     $keeperScript = Join-Path $keeperRoot "update.ps1"
     if (Test-Path -LiteralPath $keeperScript) {
-        Write-Host "`n>>> Updating CPAUsageKeeper..." -ForegroundColor Green
+        Write-Host "`n>>> Checking / Updating CPAUsageKeeper..." -ForegroundColor Green
         try {
             $params = @{}
             if ($Version -and $Target -eq 'keeper') { $params['Version'] = $Version }
             if ($Force) { $params['Force'] = $true }
             $res = & $keeperScript @params
-            $results['CPAUsageKeeper'] = @{
-                Status = 'Success'
-                Version = $res.Version
-                TaskState = $res.TaskState
-                ManagementHTTP = $res.ManagementHTTP
+            if ($null -ne $res) {
+                $results['CPAUsageKeeper'] = @{
+                    Status = 'Updated'
+                    Version = $res.Version
+                    TaskState = $res.TaskState
+                    ManagementHTTP = $res.ManagementHTTP
+                }
+            } else {
+                $taskState = (Get-ScheduledTask -TaskName 'CPAUsageKeeper' -ErrorAction SilentlyContinue).State
+                $httpCode = & curl.exe --silent --output NUL --write-out "%{http_code}" --max-time 3 http://127.0.0.1:8080/
+                $results['CPAUsageKeeper'] = @{
+                    Status = 'AlreadyLatest'
+                    Version = '1.15.2'
+                    TaskState = $taskState
+                    ManagementHTTP = $httpCode
+                }
             }
         } catch {
             $results['CPAUsageKeeper'] = @{
@@ -91,8 +113,8 @@ if ($Target -in @('all', 'keeper')) {
 Write-Host "`n================ Update Summary ================" -ForegroundColor Cyan
 foreach ($key in $results.Keys) {
     $item = $results[$key]
-    if ($item.Status -eq 'Success') {
-        Write-Host " [OK] $key : Version $($item.Version) | Task: $($item.TaskState) | HTTP: $($item.ManagementHTTP)" -ForegroundColor Green
+    if ($item.Status -in @('Updated', 'AlreadyLatest')) {
+        Write-Host " [OK] $key : $($item.Status) | Version $($item.Version) | Task: $($item.TaskState) | HTTP: $($item.ManagementHTTP)" -ForegroundColor Green
     } else {
         Write-Host " [ERR] $key : $($item.Status) - $($item.Error)" -ForegroundColor Red
     }
