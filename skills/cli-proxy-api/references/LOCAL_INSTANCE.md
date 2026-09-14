@@ -1,6 +1,6 @@
 # 本机 CLIProxyAPI 接入事实
 
-身份以本机 use-local 为准。
+身份以本机 use-local 为准。host:port 从 Windows `config.yaml` 现查。OpenAI 兼容路径是 `/v1`；Anthropic 是根路径。CPA Usage Keeper 是用量看板（Management API），不配进 Agent。
 
 ## 请求转换
 

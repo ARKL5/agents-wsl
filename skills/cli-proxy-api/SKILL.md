@@ -27,7 +27,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File skills/cli-proxy-api/scripts/updat
 
 只处理用户点名的那一个客户端、Agent 或项目。读 [`references/LOCAL_INSTANCE.md`](references/LOCAL_INSTANCE.md)。服务与带客户端 key 的 `/v1/models` 可用再改配置；失败则停并报告失败层。
 
-写入字段以本机 `--help` / schema 或该版本官方文档为准。协议入口和 base URL 从身份文件加官方契约现查。保留已有 provider、模型角色、插件和无关设置；未指定模型则保留当前默认。
+写入字段以本机 `--help` / schema 或该版本官方文档为准。协议入口和 base URL 从 LOCAL_INSTANCE 与 Windows `config.yaml` 现查。保留已有 provider、模型角色、插件和无关设置；未指定模型则保留当前默认。
 
 改前在同一私有配置目录做时间戳备份。密钥只从 `api-keys` 进程内解析，输出 `<redacted>`。仓库只存环境变量名或秘密引用。
 
