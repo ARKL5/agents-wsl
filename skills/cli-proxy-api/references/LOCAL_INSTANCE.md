@@ -18,6 +18,4 @@ Windows 根配置保持 `disable-image-generation: "passthrough"`。普通请求
 
 ## 预检
 
-- 管理页 200：服务存活。
-- 带客户端 key 的 `/v1/models` 200：认证和目录可用。
-- 端到端最小请求：目标协议适配成功。
+跑 `scripts/precheck.ps1`（管理页、`/v1/models`、key 数量；值不打印）。端到端最小请求仍按目标客户端。

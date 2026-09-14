@@ -11,7 +11,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-# 1. 自动发现本地代理并设置环境变量（curl.exe 下载 GitHub Releases 需要）
+# Discover local mixed proxy for GitHub downloads.
 if (-not $env:HTTP_PROXY -and -not $env:ALL_PROXY) {
     $candidates = @(7897, 7890, 10808, 10809, 20171, 7893)
     $active = Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
@@ -29,14 +29,60 @@ if (-not $env:HTTP_PROXY -and -not $env:ALL_PROXY) {
     }
 }
 
-$cpaRoot = "C:\Users\38993\AppData\Local\CLIProxyAPI"
-$keeperRoot = "C:\Users\38993\AppData\Local\CPAUsageKeeper"
+$cpaRoot = 'C:\Users\38993\AppData\Local\CLIProxyAPI'
+$keeperRoot = 'C:\Users\38993\AppData\Local\CPAUsageKeeper'
+
+function Get-YamlPort([string]$Path, [int]$Default) {
+    if (-not (Test-Path -LiteralPath $Path)) { return $Default }
+    foreach ($line in Get-Content -LiteralPath $Path) {
+        if ($line -match '^port:\s*["'']?(\d+)') { return [int]$Matches[1] }
+    }
+    return $Default
+}
+
+function Get-CpaInstalledVersion {
+    $log = Join-Path $cpaRoot 'logs\main.log'
+    if (Test-Path -LiteralPath $log) {
+        $match = Get-Content -LiteralPath $log -Tail 300 -Encoding UTF8 |
+            Select-String -Pattern 'CLIProxyAPI Version:\s*([^,\s]+)' |
+            Select-Object -Last 1
+        if ($match -and $match.Matches.Count -gt 0) {
+            return $match.Matches[0].Groups[1].Value.TrimStart('v')
+        }
+    }
+    $exe = Join-Path $cpaRoot 'bin\cli-proxy-api.exe'
+    if (Test-Path -LiteralPath $exe) {
+        $text = & $exe --help 2>&1 | Out-String
+        if ($text -match 'CLIProxyAPI Version:\s*([^,\s]+)') {
+            return $Matches[1].TrimStart('v')
+        }
+    }
+    return 'none'
+}
+
+function Get-KeeperInstalledVersion {
+    $exe = Join-Path $keeperRoot 'bin\cpa-usage-keeper.exe'
+    if (-not (Test-Path -LiteralPath $exe)) { return 'none' }
+    $output = & $exe -v 2>&1 | Select-Object -First 1
+    $text = [string]$output
+    if ($text -match 'v?(\d+\.\d+\.\d+)') { return $Matches[1] }
+    return 'none'
+}
+
+function Get-HttpCode([string]$Url) {
+    $code = & curl.exe --silent --output NUL --write-out '%{http_code}' --max-time 3 $Url 2>$null
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($code)) { return '000' }
+    return $code
+}
+
+$cpaPort = Get-YamlPort (Join-Path $cpaRoot 'config.yaml') 8317
+$cpaHealth = "http://127.0.0.1:$cpaPort/management.html"
+$keeperHealth = 'http://127.0.0.1:8080/'
 
 $results = [ordered]@{}
 
-# 2. 更新 CLIProxyAPI
 if ($Target -in @('all', 'cpa')) {
-    $cpaScript = Join-Path $cpaRoot "update.ps1"
+    $cpaScript = Join-Path $cpaRoot 'update.ps1'
     if (Test-Path -LiteralPath $cpaScript) {
         Write-Host "`n>>> Checking / Updating CLIProxyAPI..." -ForegroundColor Green
         try {
@@ -53,12 +99,11 @@ if ($Target -in @('all', 'cpa')) {
                 }
             } else {
                 $taskState = (Get-ScheduledTask -TaskName 'CLIProxyAPI' -ErrorAction SilentlyContinue).State
-                $httpCode = & curl.exe --silent --output NUL --write-out "%{http_code}" --max-time 3 http://127.0.0.1:8317/management.html
                 $results['CLIProxyAPI'] = @{
                     Status = 'AlreadyLatest'
-                    Version = '7.2.155'
+                    Version = Get-CpaInstalledVersion
                     TaskState = $taskState
-                    ManagementHTTP = $httpCode
+                    ManagementHTTP = Get-HttpCode $cpaHealth
                 }
             }
         } catch {
@@ -72,9 +117,8 @@ if ($Target -in @('all', 'cpa')) {
     }
 }
 
-# 3. 更新 CPAUsageKeeper
 if ($Target -in @('all', 'keeper')) {
-    $keeperScript = Join-Path $keeperRoot "update.ps1"
+    $keeperScript = Join-Path $keeperRoot 'update.ps1'
     if (Test-Path -LiteralPath $keeperScript) {
         Write-Host "`n>>> Checking / Updating CPAUsageKeeper..." -ForegroundColor Green
         try {
@@ -91,12 +135,11 @@ if ($Target -in @('all', 'keeper')) {
                 }
             } else {
                 $taskState = (Get-ScheduledTask -TaskName 'CPAUsageKeeper' -ErrorAction SilentlyContinue).State
-                $httpCode = & curl.exe --silent --output NUL --write-out "%{http_code}" --max-time 3 http://127.0.0.1:8080/
                 $results['CPAUsageKeeper'] = @{
                     Status = 'AlreadyLatest'
-                    Version = '1.15.2'
+                    Version = Get-KeeperInstalledVersion
                     TaskState = $taskState
-                    ManagementHTTP = $httpCode
+                    ManagementHTTP = Get-HttpCode $keeperHealth
                 }
             }
         } catch {
@@ -115,8 +158,10 @@ foreach ($key in $results.Keys) {
     $item = $results[$key]
     if ($item.Status -in @('Updated', 'AlreadyLatest')) {
         Write-Host " [OK] $key : $($item.Status) | Version $($item.Version) | Task: $($item.TaskState) | HTTP: $($item.ManagementHTTP)" -ForegroundColor Green
+    } elseif ($item.Status -eq 'NotFound') {
+        Write-Host " [ERR] $key : NotFound - $($item.Path)" -ForegroundColor Red
     } else {
         Write-Host " [ERR] $key : $($item.Status) - $($item.Error)" -ForegroundColor Red
     }
 }
-Write-Host "================================================" -ForegroundColor Cyan
+Write-Host '================================================' -ForegroundColor Cyan
