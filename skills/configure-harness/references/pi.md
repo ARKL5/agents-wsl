@@ -21,7 +21,7 @@
 
 | 约定 | 说明 |
 | --- | --- |
-| provider | `cliproxy`；baseUrl 现查 live；监听约定见 `/home/ark/.agents/references/local-cliproxy.md` |
+| provider | `cliproxy`；baseUrl 现查 live |
 | 模型路由 | 以 live `settings.json` / `models.json` 为准；本文件不固定主线程模型 |
 | 排队 | 意图为 `steeringMode=all` · `followUpMode=all`（改前先读 live） |
 | Thinking 显示 | 隐藏 |
@@ -58,7 +58,7 @@ ls ~/.pi/agent/extensions
 printf 'PI_FFF_MODE=%s FFF_ENABLE_HOME_SCAN=%s\n' "${PI_FFF_MODE-}" "${FFF_ENABLE_HOME_SCAN-}"
 ```
 
-上游存活：baseUrl 从 live settings/models 读；监听约定见 `/home/ark/.agents/references/local-cliproxy.md`。
+上游存活：baseUrl 从 live settings/models 读。
 
 ## 更新 / 修复
 
