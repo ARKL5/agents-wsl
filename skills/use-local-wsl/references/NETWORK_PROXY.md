@@ -31,7 +31,7 @@ Shell 有代理不能证明 systemd/Docker/构建已走代理。
 
 ## Local CLIProxyAPI
 
-实例身份（监听、安装根）：[`/home/ark/.agents/references/local-cliproxy.md`](/home/ark/.agents/references/local-cliproxy.md)。接入或更新工序走 `cli-proxy-api`。
+Windows 跑唯一实例；WSL 经 mirrored 回环用它。接入或更新走 `cli-proxy-api`。安装根与计划任务以该 skill 的脚本为准；监听从 Windows `config.yaml` 现查。
 
 ## Tool fetch / Fake-IP
 
