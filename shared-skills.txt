@@ -1,3 +1,4 @@
+agent-doc-kit
 cli-proxy-api
 domain-modeling
 fetch-media
