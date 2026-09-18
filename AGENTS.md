@@ -12,6 +12,10 @@
 
 **共享名单**（判断一个 skill 是否共享）：[`shared-skills.txt`](shared-skills.txt)
 
+**词表**（两侧边界用语）：[`CONTEXT.md`](CONTEXT.md)
+
+**准入**（进共享名单的条件）：[`docs/adr/`](docs/adr/)
+
 ## 检查
 
 **完成命令**（声称完成时跑）：`uv run tools/check.py`

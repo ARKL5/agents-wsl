@@ -1,10 +1,13 @@
 cli-proxy-api
+domain-modeling
 fetch-media
 find-docs
 grill-me
+grill-with-docs
 grilling
 handoff
 research
 sync-agent-skills
 teach
+wait-what
 writing-for-agents
