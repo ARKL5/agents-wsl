@@ -4,7 +4,7 @@
 
 **Code**: `tools/sync.py`
 
-**Status**: accepted
+**Status**: superseded by ADR-0003
 
 ## Considered Options
 

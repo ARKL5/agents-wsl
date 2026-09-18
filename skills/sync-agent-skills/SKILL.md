@@ -36,6 +36,6 @@ disable-model-invocation: true
 
 在本侧 `~/.agents` 跑 `uv run tools/sync.py`。
 
-脚本自动检查工作区、执行 `git pull --ff-only`、拉取 WSL 提交并自动筛选 cherry-pick 属于 `shared-skills.txt` 的变更，最后跑 `tools/check.py` 校验。
+有 `wsl` remote 时，脚本把 `wsl/main` 上的共享名单、协议文件和名单里每个 skill 检出到本侧，有改动则提交 `sync: shared set from wsl/main`。然后 `tools/check.py`。
 
-完成：以脚本输出为准，报告 pull 状态、已收下的 shared 提交、跳过/冲突情况与 check 校验结果。
+完成：以脚本输出为准。
