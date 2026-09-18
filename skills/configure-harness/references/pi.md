@@ -48,31 +48,15 @@
 
 ## 现查（动手前）
 
-```bash
-pi --version
-pi list
-jq . ~/.pi/agent/settings.json
-jq . ~/.pi/agent/models.json
-ls ~/.pi/agent/extensions
-. ~/.config/pi-env.sh
-printf 'PI_FFF_MODE=%s FFF_ENABLE_HOME_SCAN=%s\n' "${PI_FFF_MODE-}" "${FFF_ENABLE_HOME_SCAN-}"
-```
-
-上游存活：baseUrl 从 live settings/models 读。
+`pi list`、live `settings.json` / `models.json` / extensions / `~/.config/pi-env.sh`。上游 baseUrl 从 live 读。
 
 ## 更新 / 修复
 
 仅当用户点名更新、修复、装卸包或改约定时走这里。投影表面不必跑。
 
-优先单包更新；仅用户明确要求时才 `--extensions` / `--all`。源字符串带 `@版本` 的 npm 包通常不参加批量更新——以 `pi list` 为准。
+优先单包更新；批量 flags 现查 `pi update --help`。源字符串带 `@版本` 的 npm 包通常不参加批量更新——以 `pi list` 为准。
 
-```bash
-pi update
-pi update --extension <source>
-pi update --extensions
-pi update --all
-bash /home/ark/.agents/skills/configure-harness/assets/pi-web-access/reapply-adaptation.sh
-```
+fake-IP 重放 [`assets/pi-web-access/reapply-adaptation.sh`](../assets/pi-web-access/reapply-adaptation.sh)。
 
 **Multi-skills**：运行时 `~/.pi/agent/extensions/multi-skills.ts`；镜像 `assets/extensions/multi-skills.ts`。
 
