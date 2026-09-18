@@ -13,21 +13,13 @@ disable-model-invocation: true
 
 ## 更新
 
-```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Users\38993\.agents\skills\cli-proxy-api\scripts\update.ps1 [-Target all|cpa|keeper] [-Version <v>] [-Force]
-```
-
-参数按需（默认两侧 latest）。以脚本汇总为准。
+跑 [`scripts/update.ps1`](scripts/update.ps1)。参数以脚本为准（默认两侧 latest）。以脚本汇总为准。
 
 完成：报告两侧版本及 HTTP 200。
 
 ## 接入
 
-只处理用户点名的那一个客户端、Agent 或项目。读 [`references/LOCAL_INSTANCE.md`](references/LOCAL_INSTANCE.md)。先跑 `scripts/precheck.ps1`；失败则停并报告失败层。
-
-```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File C:\Users\38993\.agents\skills\cli-proxy-api\scripts\precheck.ps1
-```
+只处理用户点名的那一个客户端、Agent 或项目。读 [`references/LOCAL_INSTANCE.md`](references/LOCAL_INSTANCE.md)。先跑 [`scripts/precheck.ps1`](scripts/precheck.ps1)；失败则停并报告失败层。
 
 写入字段以本机 `--help` / schema 或该版本官方文档为准。协议入口和 base URL 从 LOCAL_INSTANCE 与 Windows `config.yaml` 现查。保留已有 provider、模型角色、插件和无关设置；未指定模型则保留当前默认。
 

@@ -18,4 +18,4 @@ Windows 根配置保持 `disable-image-generation: "passthrough"`。普通请求
 
 ## 预检
 
-跑 `scripts/precheck.ps1`（管理页、`/v1/models`、key 数量；值不打印）。端到端最小请求仍按目标客户端。
+跑 `scripts/precheck.ps1`。失败则停。端到端最小请求仍按目标客户端。
