@@ -6,7 +6,7 @@
 
 不是落点。已有 `~/.gemini/config/` 下的自定义类型先不动，除非用户这轮点名删除。
 
-`AGENTS.md` / `GEMINI.md` 不是落点。现查：`agy --help`、`agy agent`；官方字段走 `find-docs`。本机内置说明在 `~/.gemini/antigravity-cli/builtin/skills/`。
+现查：`agy --help`、`agy agent`；官方字段走 `find-docs`。本机内置说明在 `~/.gemini/antigravity-cli/builtin/skills/`。
 
 ## 表面
 

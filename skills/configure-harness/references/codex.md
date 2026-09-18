@@ -6,7 +6,7 @@
 
 不是落点。已有 `~/.codex/agents/` 下的自定义类型先不动，除非用户这轮点名删除。
 
-`~/.codex/AGENTS.md` 不是落点。现查：`codex --help`、官方 custom agents 文档（`find-docs`）
+现查：`codex --help`、官方 custom agents 文档（`find-docs`）
 
 ## 表面
 

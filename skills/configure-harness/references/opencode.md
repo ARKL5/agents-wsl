@@ -4,7 +4,7 @@
 
 不是落点。已有 `opencode.json` 里的自定义 `agent.*` 先不动，除非用户这轮点名删除。
 
-`~/.config/opencode/AGENTS.md` 不是落点。现查：`opencode --help`、该 json 的 `$schema`；官方字段走 `find-docs`
+现查：`opencode --help`、该 json 的 `$schema`；官方字段走 `find-docs`
 
 ## 表面
 

@@ -6,7 +6,7 @@
 
 不是落点。已有 `~/.pi/agent/agents/` 下的自定义类型先不动，除非用户这轮点名删除。
 
-`~/.pi/agent/AGENTS.md` 不是落点。现查：`pi --help`、`pi list`
+现查：`pi --help`、`pi list`
 
 ## 表面
 
@@ -37,7 +37,7 @@
 
 ```text
 ~/.pi/agent/
-  AGENTS.md · settings.json · models.json · auth.json
+  settings.json · models.json · auth.json
   agents/
   extensions/multi-skills.ts
   npm/node_modules/…

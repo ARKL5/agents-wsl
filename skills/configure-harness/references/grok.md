@@ -6,7 +6,7 @@
 
 不是落点。已有 `~/.grok/agents/` 下的自定义类型先不动，除非用户这轮点名删除。
 
-`~/.grok/AGENTS.md` 不是落点。现查：`~/.grok/docs/user-guide/16-subagents.md`、`05-configuration.md`、`grok inspect`；官方字段走 `find-docs`
+现查：`~/.grok/docs/user-guide/16-subagents.md`、`05-configuration.md`、`grok inspect`；官方字段走 `find-docs`
 
 ## 表面
 
