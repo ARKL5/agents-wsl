@@ -1,24 +1,22 @@
 ---
 name: to-spec
-description: "Turn the current conversation into a spec: no interview, just synthesis of what you've already discussed."
+description: "Turn the current conversation or a source document into a spec, filling in technical details from the repository."
 disable-model-invocation: true
 ---
 
-This skill takes the current conversation context and codebase understanding and produces a spec. Synthesize what you already know.
+Synthesize the source decisions into a spec. Fill in technical details from repository evidence; ask a focused question only when a missing decision would change observable behavior, acceptance, or scope.
 
 **Where the spec physically lives.** Read [spec-operations.md](spec-operations.md).
 
 The source is this conversation, or a path the user passed. If they passed one, fetch it and follow its title links to the files that hold the bindings.
 
-Publish only when every observable behavior has checkable acceptance. Otherwise **stop** and list the missing bindings.
+Give every observable behavior checkable acceptance derived from the source. Resolve blocking decisions before publishing.
 
 ## Process
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
 
-2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
-
-Check with the user that these seams match their expectations. Seams choose where to test. If a seam answer would redraw observable behavior or out of scope, **stop** and list that as missing.
+2. Identify the public interfaces through which the specified behavior can be verified. Reuse agreed testing seams; otherwise select suitable existing interfaces from the repository. Record newly selected seams as technical proposals without a separate confirmation step. Leave test files, mocks, and helpers to implementation.
 
 3. Write the spec using the template below, then publish it as spec-operations.md specifies.
 
@@ -40,7 +38,7 @@ Check with the user that these seams match their expectations. Seams choose wher
 
 ## Testing seams
 
-<the seams confirmed in step 2>
+<interfaces through which behavior will be verified; distinguish existing agreements from technical proposals>
 
 </spec-template>
 
