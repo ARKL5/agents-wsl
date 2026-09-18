@@ -10,7 +10,6 @@ DISCOVER="${SCRIPT_DIR}/discover-proxy.sh"
 PROXY_ENV="${HOME_DIR}/.config/proxy-env.sh"
 WSLCONFIG="/mnt/c/Users/38993/.wslconfig"
 SECRETS="${HOME_DIR}/.env.secrets"
-LEFTOVER="/home/ark/CODE/ARK-skills/scripts/wsl/strip-leftover-links.py"
 PS="/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
 WSL_EXE="/mnt/c/Windows/System32/wsl.exe"
 
@@ -113,17 +112,17 @@ if [ -r "$PROXY_ENV" ]; then
   printf_kv 'exists' yes
   grep -E '^(export[[:space:]]+)?(http_proxy|https_proxy|HTTP_PROXY|HTTPS_PROXY|all_proxy|ALL_PROXY|no_proxy|NO_PROXY|NODE_USE_ENV_PROXY)=' "$PROXY_ENV" \
     | sed -E 's/=.*/=set/'
-  prof_yes=0
+  prof_yes=1
   for f in "${HOME_DIR}/.profile" "${HOME_DIR}/.bashrc"; do
     if grep -q 'proxy-env.sh' "$f" 2>/dev/null; then
       printf_kv "$(basename "$f")_loads_proxy_env" yes
-      prof_yes=1
     else
+      prof_yes=0
       printf_kv "$(basename "$f")_loads_proxy_env" no
     fi
   done
   if [ "$prof_yes" -eq 1 ]; then
-    status_of 'Shell' pass 'proxy-env+profile'
+    status_of 'Shell' observed 'both-profile-references-present; loading-not-verified'
   else
     status_of 'Shell' fail 'profile-does-not-source-proxy-env'
     mark_gate 'shell proxy-env profile load — not-done'
@@ -143,7 +142,7 @@ if [ -r "$APT_FILE" ]; then
   if grep -q 'Acquire::http::Proxy' "$APT_FILE" && grep -q 'Acquire::https::Proxy' "$APT_FILE"; then
     printf_kv 'Acquire::http::Proxy' present
     printf_kv 'Acquire::https::Proxy' present
-    status_of 'APT' pass '80proxy-present'
+    status_of 'APT' observed 'proxy-keys-present; endpoint-not-verified'
   else
     printf_kv 'keys' incomplete
     status_of 'APT' fail '80proxy-missing-keys'
@@ -163,10 +162,10 @@ GIT_SPROXY="$(git config --global --get https.proxy 2>/dev/null)"
 if [ -n "$GIT_PROXY$GIT_SPROXY" ]; then
   printf_kv 'git-http.proxy' set
   printf_kv 'git-https.proxy' "$([ -n "$GIT_SPROXY" ] && echo set || echo absent)"
-  status_of 'Git-HTTP' pass 'git-config-proxy'
+  status_of 'Git-HTTP' observed 'git-config-proxy; request-not-verified'
 else
   printf_kv 'git-http.proxy' inherit-shell
-  status_of 'Git-HTTP' pass 'inherit-shell'
+  status_of 'Git-HTTP' observed 'inherit-shell; request-not-verified'
 fi
 
 # GitHub SSH
@@ -175,9 +174,9 @@ SSH_CFG="${HOME_DIR}/.ssh/config"
 if [ -r "$SSH_CFG" ]; then
   printf_kv 'file' "$SSH_CFG"
   printf_kv 'exists' yes
-  if grep -Eiq 'ProxyCommand' "$SSH_CFG" && grep -Eq 'nc .*-x' "$SSH_CFG"; then
+  if ssh -G github.com 2>/dev/null | grep -Eiq '^proxycommand .*\bnc\b.*[[:space:]]-x[[:space:]]'; then
     printf_kv 'ProxyCommand' 'present (nc -x)'
-    status_of 'GitHub-SSH' pass 'proxycommand-nc'
+    status_of 'GitHub-SSH' observed 'effective-proxycommand-nc; request-not-verified'
   else
     printf_kv 'ProxyCommand' absent-or-not-nc-x
     status_of 'GitHub-SSH' fail 'no-proxycommand'
@@ -230,7 +229,7 @@ if [ -r "$DOCK_FILE" ]; then
     fi
   fi
   if [ "$dock_ok" -eq 1 ]; then
-    status_of 'Docker-daemon' pass 'drop-in-present'
+    status_of 'Docker-daemon' observed 'drop-in-present; active-environment-not-verified'
   else
     status_of 'Docker-daemon' fail 'drop-in-incomplete'
     mark_gate 'dockerd /etc/systemd/system/docker.service.d/http-proxy.conf — not-done'
@@ -250,7 +249,7 @@ if [ -r "$CHROME_BIN" ]; then
   printf_kv 'exists' yes
   if grep -q 'proxy-env.sh' "$CHROME_BIN"; then
     printf_kv 'sources_proxy_env' yes
-    status_of 'WSL-Chrome' pass 'launcher-sources-proxy-env'
+    status_of 'WSL-Chrome' observed 'launcher-references-proxy-env; flags-not-verified'
   else
     printf_kv 'sources_proxy_env' no
     status_of 'WSL-Chrome' fail 'launcher-no-proxy-env'
@@ -578,22 +577,14 @@ PY
 )"
 POINT_COUNT="$(printf '%s' "$POINT_COUNT" | tr -d '[:space:]')"
 if [ "${POINT_COUNT:-0}" != "0" ]; then
-  mark_safe "remove copy-type product point dirs (count=${POINT_COUNT}) — not-done"
+  echo "review-only: skills-only directories (count=${POINT_COUNT}); verify copied contents before removal"
 fi
 
 echo
-echo '--- broken / Windows-Docker-Desktop links ---'
+echo '--- dangling links ---'
 python3 - <<'PY'
 import os
 dirs = ["/usr/local/bin", "/usr/local/lib/docker/cli-plugins"]
-needles = (
-    "/Program Files/Docker",
-    "/Program Files/Microsoft VS Code",
-    "/Docker/host",
-    "docker-desktop",
-    "/mnt/wsl/docker-desktop",
-    "/AppData/Local/Programs/Microsoft VS Code",
-)
 found = []
 for d in dirs:
     if not os.path.isdir(d):
@@ -615,11 +606,8 @@ for d in dirs:
             print(f"fail readlink {path}: {e}")
             continue
         dangling = not os.path.exists(path)
-        win = any(n.lower() in target.replace("\\", "/").lower() for n in needles) or any(
-            n.lower() in path.replace("\\", "/").lower() for n in ("/Docker/host",)
-        )
-        if dangling or win:
-            kind = "dangling" if dangling else "windows-or-docker-desktop"
+        if dangling:
+            kind = "dangling"
             print(f"broken {path} -> {target} kind={kind}")
             found.append(path)
 print(f"broken-link-count={len(found)}")
@@ -627,14 +615,6 @@ PY
 BROKEN_COUNT="$(python3 - <<'PY'
 import os
 dirs = ["/usr/local/bin", "/usr/local/lib/docker/cli-plugins"]
-needles = (
-    "/Program Files/Docker",
-    "/Program Files/Microsoft VS Code",
-    "/Docker/host",
-    "docker-desktop",
-    "/mnt/wsl/docker-desktop",
-    "/AppData/Local/Programs/Microsoft VS Code",
-)
 n = 0
 for d in dirs:
     if not os.path.isdir(d):
@@ -646,11 +626,9 @@ for d in dirs:
         try:
             target = os.readlink(path)
         except OSError:
-            n += 1
             continue
         dangling = not os.path.exists(path)
-        win = any(x.lower() in target.replace("\\", "/").lower() for x in needles)
-        if dangling or win:
+        if dangling:
             n += 1
 print(n)
 PY
@@ -695,18 +673,6 @@ else
   status_of 'env.secrets-mode' fail 'missing'
 fi
 
-echo
-echo '--- farm symlinks into source root (leftover; do not delete) ---'
-if [ -f "$LEFTOVER" ]; then
-  echo "tool=${LEFTOVER} --check"
-  if [ -x "$LEFTOVER" ] || [ -f "$LEFTOVER" ]; then
-    "$LEFTOVER" --check
-  else
-    echo 'fail leftover-tool-not-runnable'
-  fi
-else
-  echo "fail leftover-tool-missing ${LEFTOVER}"
-fi
 
 echo
 echo '======== 步4 两档修复（只列不修） ========'

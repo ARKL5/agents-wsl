@@ -33,5 +33,5 @@
 
 工序在 Windows `use-local-windows` 的 `references/AUDIT.md`。runner：[`../scripts/audit-live-check.sh`](../scripts/audit-live-check.sh)。
 
-- 家目录下「顶层只有复制来的 `skills/`」的产品点目录（同一分钟批量生成的那种）是噪音，巡检时删。不要动 `~/.agents`。
+- 家目录下顶层只有 `skills/` 的产品点目录先列为待核实；确认内容是安装器批量复制的残留后再删。不要动 `~/.agents`。
 - `/usr/local/bin` 与 `/usr/local/lib/docker/cli-plugins` 里指向已卸软件的断链（例如旧 Docker Desktop、已消失的盘符上的 VS Code）删掉。

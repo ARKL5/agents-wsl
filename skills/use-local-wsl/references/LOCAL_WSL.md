@@ -15,7 +15,7 @@
 **WSL/Windows/Ubuntu 版本号、CPU/内存/swap 现查**，不在本文件维护：
 
 ```bash
-wsl.exe --version
+/mnt/c/Windows/System32/wsl.exe --version
 uname -a
 cat /etc/os-release
 nproc
