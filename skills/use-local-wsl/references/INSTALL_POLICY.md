@@ -13,10 +13,12 @@
 | 命令 | 装法 | 落点 |
 | --- | --- | --- |
 | `claude` | `curl -fsSL https://claude.ai/install.sh \| bash` | `~/.local/share/claude` |
-| `opencode` | 官方 install 脚本，`--no-modify-path` | `~/.opencode/bin` |
+| `opencode` | `https://opencode.ai/v2/install`，`--no-modify-path`；更新 `opencode upgrade --method curl` | `~/.opencode/bin` |
 | `grok` / `codex` | 各自官方安装器 | 现查 |
 
-`pi` 官方入口是 npm，不换二进制。
+`~/.local/bin/opencode` 与 `opencode2` 指向 `~/.opencode/bin/opencode`（真二进制）。官方同目录 shim 用 `$0` 找邻居，经 `~/.local/bin` 会自递归。
+
+`pi` 官方入口是 npm（`--ignore-scripts`），不换二进制。更新 `pi update --self`。
 
 ## Node
 
