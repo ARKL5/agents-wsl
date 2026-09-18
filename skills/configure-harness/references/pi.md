@@ -31,18 +31,17 @@
 | 扩展 | 只留 FFF、Multi-skills、`pi-web-access` |
 | Multi-skills | 本地扩展：提示内 `$skill-a $skill-b …` 原子加载已注册 skill（含 user-only） |
 | FFF | `@ff-labs/pi-fff` 不钉版本。`PI_FFF_MODE=override`；家目录扫描关；`PI_FFF_MULTIGREP` 保持未设。env 落点 `~/.config/pi-env.sh` |
-| 联网 | `pi-web-access` + 本地 SSRF 适配（Clash fake-IP） |
+| 联网 | `pi-web-access` 不钉版本。本地 SSRF 适配（Clash fake-IP） |
 
 ## 关键路径
 
 ```text
 ~/.pi/agent/
-  settings.json · models.json · auth.json
+  settings.json · models.json · auth.json · web-search.json
   agents/
   extensions/multi-skills.ts
   npm/node_modules/…
   fff/
-~/.pi/web-search.json
 ~/.config/pi-env.sh
 ```
 
@@ -60,7 +59,7 @@ fake-IP 重放 [`assets/pi-web-access/reapply-adaptation.sh`](../assets/pi-web-a
 
 **Multi-skills**：运行时 `~/.pi/agent/extensions/multi-skills.ts`；镜像 `assets/extensions/multi-skills.ts`。
 
-**pi-web-access / fake-IP**：期望片段 `assets/pi-web-access/web-search.json`（`ssrf.allowRanges` 含 `198.18.0.0/15`）；重放脚本合并、不覆盖用户其它字段。Done：读 `~/.pi/web-search.json` 含该段。
+**pi-web-access / fake-IP**：期望片段 `assets/pi-web-access/web-search.json`（`ssrf.allowRanges` 含 `198.18.0.0/15`）；重放脚本写入 live `~/.pi/agent/web-search.json`（无该文件时从 `~/.pi/web-search.json` 种子），合并、不覆盖用户其它字段。Done：读 live 文件含该段。
 
 FFF 斜杠 `/fff-health` · `/fff-rescan` · `/fff-mode` 以现查为准。新会话以 `~/.config/pi-env.sh` 为准。
 

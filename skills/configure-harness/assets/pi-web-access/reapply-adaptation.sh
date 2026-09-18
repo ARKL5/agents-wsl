@@ -3,11 +3,32 @@
 # Existing web-search.json keys are preserved; only ssrf.allowRanges is merged.
 set -euo pipefail
 
-CONFIG_DIR="${PI_CODING_AGENT_DIR:-${HOME}/.pi}"
+# Match pi-web-access getWebSearchConfigDir: PI_CODING_AGENT_DIR, else
+# XDG (existing XDG file, else existing ~/.pi/web-search.json, else XDG),
+# else ~/.pi/agent.
+if [ -n "${PI_CODING_AGENT_DIR:-}" ]; then
+  CONFIG_DIR="$PI_CODING_AGENT_DIR"
+elif [ -n "${XDG_CONFIG_HOME:-}" ]; then
+  xdg_dir="${XDG_CONFIG_HOME}/pi"
+  if [ -f "${xdg_dir}/web-search.json" ]; then
+    CONFIG_DIR="$xdg_dir"
+  elif [ -f "${HOME}/.pi/web-search.json" ]; then
+    CONFIG_DIR="${HOME}/.pi"
+  else
+    CONFIG_DIR="$xdg_dir"
+  fi
+else
+  CONFIG_DIR="${HOME}/.pi/agent"
+fi
 CONFIG="${CONFIG_DIR}/web-search.json"
+LEGACY="${HOME}/.pi/web-search.json"
 ASSET="$(cd "$(dirname "$0")" && pwd)/web-search.json"
 
 mkdir -p "$CONFIG_DIR"
+if [ ! -f "$CONFIG" ] && [ -f "$LEGACY" ] && [ "$CONFIG" != "$LEGACY" ]; then
+  cp -a "$LEGACY" "$CONFIG"
+fi
+
 node --input-type=module - "$CONFIG" "$ASSET" <<'NODE'
 import { readFileSync, writeFileSync, renameSync } from "node:fs";
 import { dirname } from "node:path";
