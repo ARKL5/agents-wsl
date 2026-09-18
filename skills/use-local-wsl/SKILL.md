@@ -14,10 +14,10 @@ Open the file for each branch in scope:
 
 - [`references/LOCAL_WSL.md`](references/LOCAL_WSL.md) — identity, `.wslconfig` / `wsl.conf`, secrets, Docker, restart
 - [`references/WINDOWS_INTEROP.md`](references/WINDOWS_INTEROP.md) — path translation, `.exe`
-- [`references/NETWORK_PROXY.md`](references/NETWORK_PROXY.md) — proxy discovery (`scripts/discover-proxy.sh`) and per-layer files
+- [`references/NETWORK_PROXY.md`](references/NETWORK_PROXY.md) — proxy；现查 [`scripts/discover-proxy.sh`](scripts/discover-proxy.sh)
 - [`references/BROWSER_ROUTING.md`](references/BROWSER_ROUTING.md) — open URL/file, OpenCLI / Chrome
 - [`references/INSTALL_POLICY.md`](references/INSTALL_POLICY.md) — runtimes and the global-npm allowlist
-- 对本机对照合同巡检 → `/mnt/c/Users/38993/.agents/skills/use-local-windows/references/AUDIT.md`；步1–3 runner [`scripts/audit-live-check.sh`](scripts/audit-live-check.sh)。本 skill 不展开全表。
+- 对本机对照合同巡检 → 对侧 `use-local-windows` 的 `references/AUDIT.md`；runner [`scripts/audit-live-check.sh`](scripts/audit-live-check.sh)
 
 Done when each in-scope file is read and this run follows those files plus the hard rules below.
 
