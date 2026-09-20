@@ -29,8 +29,8 @@ if (-not $env:HTTP_PROXY -and -not $env:ALL_PROXY) {
     }
 }
 
-$cpaRoot = 'C:\Users\38993\AppData\Local\CLIProxyAPI'
-$keeperRoot = 'C:\Users\38993\AppData\Local\CPAUsageKeeper'
+$cpaRoot = Join-Path $env:LOCALAPPDATA 'CLIProxyAPI'
+$keeperRoot = Join-Path $env:LOCALAPPDATA 'CPAUsageKeeper'
 
 function Get-YamlPort([string]$Path, [int]$Default) {
     if (-not (Test-Path -LiteralPath $Path)) { return $Default }
@@ -38,6 +38,28 @@ function Get-YamlPort([string]$Path, [int]$Default) {
         if ($line -match '^port:\s*["'']?(\d+)') { return [int]$Matches[1] }
     }
     return $Default
+}
+
+function Get-DotEnvValue([string]$Path, [string]$Key) {
+    if (-not (Test-Path -LiteralPath $Path)) { return $null }
+    $prefix = '^\s*' + [regex]::Escape($Key) + '\s*=\s*(.*)$'
+    foreach ($raw in Get-Content -LiteralPath $Path) {
+        if ($raw -match $prefix) {
+            return $Matches[1].Trim().Trim('"').Trim("'")
+        }
+    }
+    return $null
+}
+
+function Get-KeeperHealthUrl {
+    $envFile = Join-Path $keeperRoot '.env'
+    $hostName = Get-DotEnvValue $envFile 'APP_HOST'
+    if ([string]::IsNullOrWhiteSpace($hostName) -or $hostName -in @('0.0.0.0', '::', '*')) {
+        $hostName = '127.0.0.1'
+    }
+    $port = Get-DotEnvValue $envFile 'APP_PORT'
+    if ([string]::IsNullOrWhiteSpace($port)) { $port = '8080' }
+    return "http://${hostName}:${port}/"
 }
 
 function Get-CpaInstalledVersion {
@@ -77,7 +99,7 @@ function Get-HttpCode([string]$Url) {
 
 $cpaPort = Get-YamlPort (Join-Path $cpaRoot 'config.yaml') 8317
 $cpaHealth = "http://127.0.0.1:$cpaPort/management.html"
-$keeperHealth = 'http://127.0.0.1:8080/'
+$keeperHealth = Get-KeeperHealthUrl
 
 $results = [ordered]@{}
 
