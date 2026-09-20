@@ -2,7 +2,7 @@
 
 # Engineering standards
 
-Use this baseline during implementation and review, alongside project constraints and automated checks.
+Use this baseline during implementation and review.
 
 ## Baseline
 
@@ -14,7 +14,7 @@ Use this baseline during implementation and review, alongside project constraint
 
 ## Project constraints
 
-<!-- Local module boundaries, compatibility obligations, and incident lessons that code/configuration cannot explain. Include their reasons. -->
+<!-- Standing local rules applied on every implementation or review: module boundaries, compatibility obligations, incident lessons. Include their reasons. -->
 
 ## Smells
 
@@ -32,9 +32,3 @@ Review cues from Fowler, _Refactoring_, ch. 3. Tie findings to concrete impact a
 - **Message Chains:** hide traversal that exposes implementation details.
 - **Middle Man:** remove delegation that adds no policy or useful boundary.
 - **Refused Bequest:** repair an unfulfilled interface contract or prefer composition.
-
-## Verification
-
-<!-- Point to the project's existing verification entry point. -->
-
-Run the applicable checks and review the diff against these standards. Report results and remaining issues.
