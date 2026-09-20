@@ -19,7 +19,13 @@ wslpath -u 'C:\Users\38993'
 
 ## Absolute Windows executables
 
-`appendWindowsPath=false`，用绝对路径：
+Windows 调 WSL 用户级工具（mise/node/uv/pi）用登录壳（默认 PATH 没有用户 shims）：
+
+```text
+wsl.exe -d Ubuntu -e /bin/bash -lc "<command>"
+```
+
+`appendWindowsPath=false`，从 WSL 调 Windows 用绝对路径：
 
 ```text
 /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe

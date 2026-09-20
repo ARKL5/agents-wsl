@@ -33,7 +33,7 @@ Interactive launcher: `/usr/local/bin/wsl-chrome` (sources `~/.config/proxy-env.
 
 | Item | Local value |
 | --- | --- |
-| Shell browser | `BROWSER=/usr/local/bin/wsl-chrome` in `~/.bashrc` |
+| Shell browser | `BROWSER=/usr/local/bin/wsl-chrome` in `~/.config/wsl-env.sh` |
 | Desktop entry | `~/.local/share/applications/wsl-google-chrome.desktop` |
 | HTTP, HTTPS, HTML mime default | `wsl-google-chrome.desktop` |
 | Chrome profile | `~/.config/google-chrome/Default`, name `ARK` |
@@ -44,7 +44,7 @@ Interactive launcher: `/usr/local/bin/wsl-chrome` (sources `~/.config/proxy-env.
 
 ## OpenCLI
 
-`OPENCLI_PROFILE` 从登录壳现查（`~/.bashrc` 会导出）。以 `opencli profile list` / `opencli doctor` 的已连接配置为准，不把配置名写回本文件。
+`OPENCLI_PROFILE` 从登录壳现查（`~/.config/wsl-env.sh` 会导出）。以 `opencli profile list` / `opencli doctor` 的已连接配置为准，不把配置名写回本文件。
 
 ```bash
 bash -lc 'printf "%s\n" "$OPENCLI_PROFILE"'
@@ -52,18 +52,12 @@ opencli profile list
 opencli doctor
 ```
 
-扩展连的若和 `$OPENCLI_PROFILE` 不同：`opencli profile use <id>` 并改 bashrc，用新的 login shell 验证。
+扩展连的若和 `$OPENCLI_PROFILE` 不同：`opencli profile use <id>` 并改 `~/.config/wsl-env.sh`，用新的 login shell 验证。
 
 用户点名站点抓取时走 `fetch-media`。
 
 ## Verification
 
-```bash
-command -v wslview
-grep enabled /proc/sys/fs/binfmt_misc/WSLInterop
-env -u BROWSER xdg-settings get default-web-browser
-xdg-mime query default x-scheme-handler/http
-bash -lc 'printf "%s\n" "$BROWSER" "$OPENCLI_PROFILE"'
-```
+[`../scripts/query.sh`](../scripts/query.sh) `browser`。
 
 Done when agent open uses `wslview` only; interactive mime still points at `wsl-google-chrome.desktop` when that layer is in scope; WSL Chrome launcher still carries proxy flags; automation stays off `ARK`; and `opencli doctor` passes when OpenCLI is in scope.

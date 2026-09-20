@@ -4,9 +4,9 @@
 
 ## Discover endpoint
 
-跑 [`../scripts/discover-proxy.sh`](../scripts/discover-proxy.sh)。不要把端口写回本文件。
+跑 [`../scripts/query.sh`](../scripts/query.sh) `network`。端口以脚本输出为准，不写回本文件。
 
-确认 `~/.profile`、`~/.bashrc` 仍 source 该文件。进程名以现查为准。
+确认 `~/.config/wsl-env.sh` 仍 source 该文件，且 `~/.bashrc` / `~/.profile` 加载 `wsl-env.sh`。进程名以现查为准。
 
 `no_proxy` / `NO_PROXY` **只有** `localhost`、`127.0.0.1`、`::1`。WSL 出网进 mixed 口；国内直连与否由 Clash 规则决定，不在 WSL `no_proxy` 里表达。
 
@@ -14,7 +14,7 @@
 
 | Consumer | Where to look |
 | --- | --- |
-| Shell | `~/.config/proxy-env.sh` + profile/bashrc |
+| Shell | `~/.config/proxy-env.sh` via `~/.config/wsl-env.sh` |
 | APT | `/etc/apt/apt.conf.d/80proxy` |
 | Git HTTP(S) | 通常继承 shell；无则查 git config |
 | GitHub SSH | `~/.ssh/config`（`ProxyCommand` / `nc -x`） |
@@ -45,8 +45,8 @@ When a fetch tool reports SSRF / private IP in `198.18.0.0/15`:
 
 ## Verification order
 
-1. 跑 `scripts/discover-proxy.sh`。巡检用 `scripts/audit-live-check.sh`。  
-2. 目标进程环境或专属配置层。  
+1. 跑 `scripts/query.sh network`。
+2. 目标进程环境或专属配置层。
 3. 做一次有范围的请求并观察是否经代理（例如 curl 的 peer 地址）。
 4. 若工具报 `198.18` SSRF：走上面的 Fake-IP 顺序，不要先改 `no_proxy` 或 TUN。
 
