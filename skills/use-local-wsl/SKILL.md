@@ -26,7 +26,7 @@ Done when each in-scope file is read, `query.sh` has been run for its Query topi
 
 - Linux work and repos in WSL; Windows tools via absolute `/mnt/c/.../*.exe` and `wslpath`.
 - Open a URL or local file for the user with `wslview`.
-- Skills 本侧工作树 `/home/ark/.agents`；各 agent 从 `/home/ark/.agents/skills` 加载 skill.
+- Skills 本侧工作树 `/home/ark/.agents`；各 agent 从 `/home/ark/.agents/skills` 加载 skill。改这棵树走 `sync-agent-skills`。
 - Back up `.wslconfig` / `wsl.conf` before edits. Distro restart only when the user authorizes interruption.
 
 Finish after the command ran in the intended environment and `query.sh` (or the command's own check) confirmed state.
