@@ -286,7 +286,7 @@ wsl_topic_node() {
 wsl_topic_tools() {
   echo 'topic=tools'
   local cmd
-  for cmd in grok claude opencode codex agy herdr pi opencli uv mise docker direnv bun; do
+  for cmd in grok claude opencode codex agy herdr pi opencli uv mise docker bun; do
     wsl_cmd_record "$cmd" "$cmd" || true
   done
   echo '## usr-local-bin'
@@ -324,12 +324,6 @@ wsl_topic_tools() {
     printf '%s\n' "$JRE_PKGS"
   else
     wsl_printf_kv 'jre_packages' none
-  fi
-  echo '## direnv-hook'
-  if grep -q direnv "${HOME_DIR}/.bashrc" "${HOME_DIR}/.profile" "$WSL_ENV" 2>/dev/null; then
-    wsl_printf_kv 'direnv_shell_hook' yes
-  else
-    wsl_printf_kv 'direnv_shell_hook' no
   fi
 }
 

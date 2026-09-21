@@ -21,7 +21,7 @@
 
 **现行内容以文件为准**（读文件，勿背文档）。意图约定（改前先对照 live）：
 
-- `.wslconfig`：`networkingMode=mirrored`，`autoProxy=false`，`dnsTunneling=true`，以及用户设定的 memory/processors/swap
+- `.wslconfig`：`networkingMode=mirrored`，`autoProxy=false`，`dnsTunneling=true`；memory / processors / swap 以文件为准。processors 少于本机逻辑核，留给 Windows 前台。
 - `wsl.conf`：`systemd=true`；`interop.enabled=true`，`appendWindowsPath=false`
 
 意图是否仍在生效：[`../scripts/query.sh`](../scripts/query.sh) `wsl`（pid1/systemd、`appendWindowsPath`、`networkingMode`）。
