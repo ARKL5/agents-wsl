@@ -76,6 +76,43 @@ else
   fail "redaction missing summary: $(printf '%s' "$redact_out" | head -c 200)"
 fi
 
+echo '== secrets hygiene =='
+sec_dir="$(mktemp -d)"
+sec_out="$(HOME="$sec_dir" /usr/bin/bash "$QUERY" shell 2>/dev/null || true)"
+if printf '%s' "$sec_out" | grep -q 'env_secrets=absent' && printf '%s' "$sec_out" | grep -q 'secrets_dir=absent'; then
+  pass 'secrets absent on empty home'
+else
+  fail "secrets absent: $(printf '%s' "$sec_out" | grep -E 'env_secrets|secrets_dir' | tr '\n' ' ')"
+fi
+printf 'export UNITTEST_TOKEN=s3cret-query-test\n' > "$sec_dir/.env.secrets"
+chmod 644 "$sec_dir/.env.secrets"
+mode_out="$(HOME="$sec_dir" /usr/bin/bash "$QUERY" shell 2>/dev/null || true)"
+if printf '%s' "$mode_out" | grep -q 'status=fail name=env-secrets-mode'; then
+  pass 'env-secrets mode 644 fails'
+else
+  fail 'env-secrets mode 644 not fail'
+fi
+if printf '%s' "$mode_out" | grep -q 's3cret-query-test'; then
+  fail 'env-secrets value leaked'
+else
+  pass 'env-secrets value redacted'
+fi
+chmod 600 "$sec_dir/.env.secrets"
+mode_ok="$(HOME="$sec_dir" /usr/bin/bash "$QUERY" shell 2>/dev/null || true)"
+if printf '%s' "$mode_ok" | grep -q 'status=ok name=env-secrets-mode'; then
+  pass 'env-secrets mode 600 ok'
+else
+  fail 'env-secrets mode 600 not ok'
+fi
+mkdir "$sec_dir/.secrets"
+dual_out="$(HOME="$sec_dir" /usr/bin/bash "$QUERY" shell 2>/dev/null || true)"
+if printf '%s' "$dual_out" | grep -q 'status=fail name=secrets-dir'; then
+  pass 'secrets-dir dual store fails'
+else
+  fail 'secrets-dir dual store not fail'
+fi
+rm -rf "$sec_dir"
+
 echo '== missing commands =='
 # Keep coreutils on PATH; drop user/local bins so uv is missing. bun is not installed.
 miss_out="$(env PATH="/usr/bin:/bin" HOME="$TMP" /usr/bin/bash "$QUERY" tools 2>/dev/null || true)"
@@ -103,6 +140,16 @@ if printf '%s' "$fail_out" | grep -q 'status=fail name=docker-version'; then
   pass 'docker version fail'
 else
   fail "docker fail branch: $(printf '%s' "$fail_out" | head -c 240)"
+fi
+
+echo '== wsl processors keys =='
+wsl_out="$("$QUERY" wsl 2>/dev/null || true)"
+if printf '%s' "$wsl_out" | grep -q '^nproc=' \
+  && printf '%s' "$wsl_out" | grep -q '^host_logical_processors=' \
+  && printf '%s' "$wsl_out" | grep -q 'name=processors-vs-host'; then
+  pass 'processors live keys'
+else
+  fail "processors keys: $(printf '%s' "$wsl_out" | grep -E 'nproc=|host_logical|processors-vs-host' | tr '\n' ' ')"
 fi
 
 echo '== read-only: config mtimes =='

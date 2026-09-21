@@ -24,11 +24,11 @@
 - `.wslconfig`：`networkingMode=mirrored`，`autoProxy=false`，`dnsTunneling=true`；memory / processors / swap 以文件为准。processors 少于本机逻辑核，留给 Windows 前台。
 - `wsl.conf`：`systemd=true`；`interop.enabled=true`，`appendWindowsPath=false`
 
-意图是否仍在生效：[`../scripts/query.sh`](../scripts/query.sh) `wsl`（pid1/systemd、`appendWindowsPath`、`networkingMode`）。
+意图是否仍在生效：[`../scripts/query.sh`](../scripts/query.sh) `wsl`（pid1/systemd、`appendWindowsPath`、`networkingMode`、`processors-vs-host`）。
 
 ## User shell secrets
 
-`/home/ark/.env.secrets`（mode `600`）是 WSL 用户 shell 凭据的单一来源；`~/.config/wsl-env.sh` 加载它（由 `~/.bashrc` / 非 bash 的 `~/.profile` 引入）。systemd / Docker / Windows 应用各有自己的凭据存储。
+`/home/ark/.env.secrets`（mode `600`）是 WSL 用户 shell 凭据的单一来源；`~/.config/wsl-env.sh` 加载它（由 `~/.bashrc` / 非 bash 的 `~/.profile` 引入）。systemd / Docker / Windows 应用各有自己的凭据存储。现查 [`../scripts/query.sh`](../scripts/query.sh) `shell`（`env_secrets_mode`、`secrets_dir`；只报名与 set/unset）。
 
 增删轮换：保持无关变量；客户端只引用 `${NAME}`；报告名与 set/unset，不回显值；用新 login shell 与最小鉴权调用验证。
 

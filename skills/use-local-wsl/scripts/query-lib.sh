@@ -182,6 +182,28 @@ wsl_topic_shell() {
   if [ -n "${BROWSER:-}" ]; then
     wsl_printf_kv 'BROWSER' "$BROWSER"
   fi
+  echo '## secrets'
+  ENV_SECRETS="${HOME_DIR}/.env.secrets"
+  if [ -f "$ENV_SECRETS" ]; then
+    wsl_printf_kv 'env_secrets' present
+    mode="$(stat -c '%a' "$ENV_SECRETS" 2>/dev/null || echo fail)"
+    wsl_printf_kv 'env_secrets_mode' "$mode"
+    if [ "$mode" = "600" ]; then
+      wsl_status 'env-secrets-mode' ok '600'
+    else
+      wsl_status 'env-secrets-mode' fail "mode=${mode}"
+    fi
+  else
+    wsl_printf_kv 'env_secrets' absent
+    wsl_status 'env-secrets' missing 'absent'
+  fi
+  if [ -e "${HOME_DIR}/.secrets" ]; then
+    wsl_printf_kv 'secrets_dir' present
+    wsl_status 'secrets-dir' fail 'dual-store-present'
+  else
+    wsl_printf_kv 'secrets_dir' absent
+    wsl_status 'secrets-dir' ok 'absent'
+  fi
 }
 
 wsl_topic_python() {
@@ -516,6 +538,32 @@ wsl_topic_wsl() {
     wsl_status '.wslconfig' ok readable
   else
     wsl_status '.wslconfig' missing 'unreadable'
+  fi
+  echo '## processors'
+  wsl_printf_kv 'nproc' "$(nproc 2>/dev/null || echo fail)"
+  processors_cfg="$(awk -F= '/^[[:space:]]*processors=/{
+    v=$2
+    sub(/[ \t]*#.*/,"",v)
+    gsub(/[ \t]/,"",v)
+    print v
+    exit
+  }' "$WSLCONFIG" 2>/dev/null || true)"
+  wsl_printf_kv 'processors_cfg' "${processors_cfg:-absent}"
+  host_logical=""
+  if [ -x "$PS" ]; then
+    host_logical="$("$PS" -NoLogo -NoProfile -Command '[Environment]::ProcessorCount' 2>/dev/null | tr -d '\r' | tail -n1)"
+  fi
+  wsl_printf_kv 'host_logical_processors' "${host_logical:-unreadable}"
+  if [ -n "$processors_cfg" ] && [ -n "$host_logical" ] \
+    && [ "$processors_cfg" -eq "$processors_cfg" ] 2>/dev/null \
+    && [ "$host_logical" -eq "$host_logical" ] 2>/dev/null; then
+    if [ "$processors_cfg" -lt "$host_logical" ]; then
+      wsl_status 'processors-vs-host' ok "wsl=${processors_cfg}<host=${host_logical}"
+    else
+      wsl_status 'processors-vs-host' fail "wsl=${processors_cfg} host=${host_logical}"
+    fi
+  else
+    wsl_status 'processors-vs-host' unverified 'count-unreadable'
   fi
   echo '## interop'
   wsl_printf_kv 'windows_path_on_PATH' "$(case ":$PATH:" in *:/mnt/c/Windows*) echo yes ;; *) echo no ;; esac)"
