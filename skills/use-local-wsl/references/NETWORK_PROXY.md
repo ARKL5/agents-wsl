@@ -31,7 +31,7 @@ Shell 有代理不能证明 systemd/Docker/构建已走代理。
 
 ## Local CLIProxyAPI
 
-Windows 跑唯一实例；WSL 经 mirrored 回环用它。接入或更新走 `cli-proxy-api`。安装根与计划任务以该 skill 的脚本为准；监听从 Windows `config.yaml` 现查。
+Windows 跑唯一实例；WSL 经 mirrored 回环用它。接入或更新走 `cli-proxy-api`。安装根与计划任务以该 skill 的脚本为准；监听以该 skill 的 precheck 为准。
 
 ## Tool fetch / Fake-IP
 
