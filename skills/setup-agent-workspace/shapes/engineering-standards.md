@@ -1,4 +1,4 @@
-<!-- Merge into existing project standards. Adapt paths and fill local sections from the repository. Remove empty sections. -->
+<!-- Merge into existing project standards. Adapt paths and fill local sections from the repository. Remove empty sections. Do not restate the verification command or link to AGENTS.md. -->
 
 # Engineering standards
 
@@ -8,13 +8,13 @@ Use this baseline during implementation and review.
 
 - **Follow the surroundings.** Follow project conventions and explain necessary departures.
 - **Complete the task.** Deliver the requested behaviour and relevant failure paths.
-- **Delete with evidence.** Check callers, tests, replacements, and compatibility obligations before removing a path.
+- **Replace outright.** A change leaves one way to do the thing. Callers and tests move with that way.
 - **Test behaviour.** Derive assertions from requirements, contracts, or defects. For fixes, show the regression fails on the bug where practical. Name tests by scenario and expected result.
-- **Automate deterministic rules.** Use lint, types, and tests; keep their configuration in tools and their entry point in the project index.
+- **Automate deterministic rules.** Use lint, types, and tests. Keep their configuration in tools, not in this file.
 
 ## Project constraints
 
-<!-- Standing local rules applied on every implementation or review: module boundaries, compatibility obligations, incident lessons. Include their reasons. -->
+<!-- Standing local rules applied on every implementation or review: module boundaries, incident lessons. Include their reasons. -->
 
 ## Smells
 
