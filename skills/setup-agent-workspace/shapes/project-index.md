@@ -1,10 +1,12 @@
-<!-- Adapt into the project's existing index. Keep populated sections and real targets. Drop pointers whose targets do not exist. -->
+<!-- Use this structure when initializing a new project's index. Keep only sections with content. -->
 
 # Project
 
-<!-- One-sentence purpose; communication language if needed. -->
+<!-- One-sentence purpose and, when needed, communication language. Put project-specific temporary-directory conventions here. -->
 
 ## Required reading
+
+<!-- Documents with reading triggers only. -->
 
 **Engineering standards** (before code or design changes, and during review): [`docs/agents/engineering-standards.md`](docs/agents/engineering-standards.md)
 
@@ -14,4 +16,4 @@
 
 ## Verification
 
-<!-- Actual command, when to run it, and what the command covers. -->
+<!-- Actual executable commands, when to run them, and what they cover. Invoke existing verification scripts directly; otherwise list the commands here. -->

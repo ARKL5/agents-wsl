@@ -1,4 +1,4 @@
-<!-- Merge into existing project standards. Adapt paths and fill local sections from the repository. Remove empty sections. Do not restate the verification command or link to AGENTS.md. -->
+<!-- Use this structure when initializing a new project's standards. Keep only sections with content. Do not restate the verification command or link to AGENTS.md. -->
 
 # Engineering standards
 
