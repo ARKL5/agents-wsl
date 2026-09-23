@@ -1,18 +1,8 @@
 # Local WSL Facts
 
-## Stable identity
+点名 `.wslconfig`、`wsl.conf`、secrets、Docker、重启时读。身份在 skill 的 Always。
 
-| Item | Value |
-| --- | --- |
-| Windows user | `ARK\38993` |
-| Default distro | `Ubuntu`, WSL 2 |
-| Linux user | `ark` |
-| Linux home | `/home/ark` |
-| Main code root | `/home/ark/CODE` |
-| Skills 本侧工作树 | `/home/ark/.agents` |
-| Skills Windows 工作树 | `/mnt/c/Users/38993/.agents` |
-
-**WSL/Windows/Ubuntu 版本号、CPU/内存/swap**：[`../scripts/query.sh`](../scripts/query.sh) `wsl`。
+**版本号、CPU/内存/swap**：[`../scripts/query.sh`](../scripts/query.sh) `wsl`。
 
 ## Configuration paths
 

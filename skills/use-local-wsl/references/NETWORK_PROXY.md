@@ -29,10 +29,6 @@ Shell 有代理不能证明 systemd/Docker/构建已走代理。
 
 `.wslconfig` 键在 [`LOCAL_WSL.md`](LOCAL_WSL.md)。本文件管出网层和 `no_proxy`。各层 Linux 配置（shell / APT / SSH / dockerd）自写 mixed 口；WSL userland 进 mixed 口，不走 Windows Mihomo TUN。关 `autoProxy` 要发行版重启才完全生效。
 
-## Local CLIProxyAPI
-
-Windows 跑唯一实例；WSL 经 mirrored 回环用它。接入或更新走 `cli-proxy-api`。安装根与计划任务以该 skill 的脚本为准；监听以该 skill 的 precheck 为准。
-
 ## Tool fetch / Fake-IP
 
 Clash Fake-IP answers public names with `198.18.0.0/15`. Clients that send the hostname to the mixed port still work. Tools that resolve first and then SSRF-block "private" ranges fail even when the proxy is healthy.
@@ -42,12 +38,3 @@ When a fetch tool reports SSRF / private IP in `198.18.0.0/15`:
 1. Confirm the same URL via curl through the discovered mixed port.
 2. Treat it as Fake-IP vs that tool's SSRF list, not as a dead proxy.
 3. Per-tool allowlist lives with the tool, not in `no_proxy`. Grok uses `web_search` (Responses API); `web_fetch` is not a repair surface.
-
-## Verification order
-
-1. 跑 `scripts/query.sh network`。
-2. 目标进程环境或专属配置层。
-3. 做一次有范围的请求并观察是否经代理（例如 curl 的 peer 地址）。
-4. 若工具报 `198.18` SSRF：走上面的 Fake-IP 顺序，不要先改 `no_proxy` 或 TUN。
-
-不要把现查到的端口写回本文件。

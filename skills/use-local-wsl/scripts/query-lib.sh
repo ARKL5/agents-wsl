@@ -487,7 +487,6 @@ wsl_topic_browser() {
     fi
   fi
   wsl_printf_kv 'BROWSER' "${BROWSER:-unset}"
-  wsl_printf_kv 'OPENCLI_PROFILE' "${OPENCLI_PROFILE:-unset}"
   if command -v xdg-settings >/dev/null 2>&1; then
     wsl_printf_kv 'default_web_browser' "$(env -u BROWSER xdg-settings get default-web-browser 2>/dev/null || echo fail)"
   fi
@@ -496,18 +495,6 @@ wsl_topic_browser() {
   fi
   if [ -r /proc/sys/fs/binfmt_misc/WSLInterop ]; then
     wsl_printf_kv 'WSLInterop' "$(grep enabled /proc/sys/fs/binfmt_misc/WSLInterop 2>/dev/null || echo unread)"
-  fi
-  echo '## opencli'
-  if command -v opencli >/dev/null 2>&1; then
-    wsl_cmd_record opencli opencli || true
-    if out="$(opencli doctor 2>/dev/null)"; then
-      printf '%s\n' "$out" | grep -E '\[(OK|WARN|FAIL|ERR)' || printf '%s\n' "$out" | head -n 20
-      wsl_status 'opencli-doctor' unverified 'ran (no credentials printed by filter)'
-    else
-      wsl_status 'opencli-doctor' fail 'doctor-failed'
-    fi
-  else
-    wsl_status 'opencli' missing 'not-in-path'
   fi
 }
 

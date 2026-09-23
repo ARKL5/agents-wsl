@@ -1,6 +1,6 @@
 # Install policy
 
-谁管什么、装法和白名单。版本与是否已装：[`../scripts/query.sh`](../scripts/query.sh) `python` / `node` / `tools`。缺的已声明运行时：[`../scripts/prepare-runtime.sh`](../scripts/prepare-runtime.sh)。
+谁管什么、装法和白名单。Windows 与 WSL 共用的 uv、mise、pnpm、npm 白名单、不预装 Java 以本文件为准。版本与是否已装：[`../scripts/query.sh`](../scripts/query.sh) `python` / `node` / `tools`。缺的已声明运行时在该项目里 `uv python install` 或 `mise install`。
 
 ## 谁管什么
 
@@ -16,7 +16,7 @@
 | 系统组件、编译工具链、原生库 | apt | 发行版 |
 | 临时一次性命令 | `npx` / `uvx` / `mise exec` | 用完即走 |
 
-mise `auto_install` 与 uv `python-downloads` 以本机配置为准（`query.sh` 现查）。准备阶段显式安装已声明的运行时。
+mise `auto_install` 与 uv `python-downloads` 以本机配置为准（`query.sh` 现查）。
 
 Python 只由 uv 管理。系统 `/usr/bin/python3` 只承载发行版包。
 
@@ -45,7 +45,7 @@ Python 只由 uv 管理。系统 `/usr/bin/python3` 只承载发行版包。
 
 ## Java 与其他语言
 
-不预装。项目约束需要时，在该项目里用 mise 声明并跑 `prepare-runtime.sh`。发行版留下的 `openjdk-*-jre-headless` 是依赖，不是开发环境。
+不预装。项目约束需要时，在该项目里用 mise 声明并 `mise install`。发行版留下的 `openjdk-*-jre-headless` 是依赖，不是开发环境。
 
 ## Docker
 

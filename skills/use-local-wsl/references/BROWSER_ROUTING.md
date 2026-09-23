@@ -4,28 +4,10 @@
 
 | Workload | Browser state |
 | --- | --- |
-| Agent open of a URL or local file for the user | Windows default app via `wslview` |
 | Interactive WSL shell / mime / CLI auth in Linux Chrome | Signed-in WSL Google Chrome profile `ARK` |
-| OpenCLI Browser Bridge | Signed-in Windows Chrome（profile **live-check**） |
 | Browser automation | A tool-owned isolated profile |
 
-Keep these profiles separate. OpenCLI is the only agent workflow that reuses signed-in Windows Chrome. Automation uses a tool-owned profile, not WSL `ARK`.
-
-## Agent open
-
-```bash
-wslview <absolute-linux-path-or-url>
-```
-
-- Files: absolute path (`readlink -f`). URLs: pass through.
-- After open, report the absolute path or URL to the user.
-- If `wslview` is missing or WSL interop is disabled, stop and report — no substitute open command.
-- Force Windows Chrome only when the task names it:
-
-```bash
-/usr/local/bin/windows-chrome "$(wslpath -w /absolute/path)"
-/usr/local/bin/windows-chrome "https://example.com"
-```
+Automation uses a tool-owned profile, not WSL `ARK`.
 
 ## WSL Chrome (shell / mime)
 
@@ -40,24 +22,6 @@ Interactive launcher: `/usr/local/bin/wsl-chrome` (sources `~/.config/proxy-env.
 | Sync | Enabled; extension sync disabled |
 | Package updates | Google APT source `/etc/apt/sources.list.d/google-chrome.sources` |
 
-`$BROWSER` and xdg mime stay WSL Chrome for interactive shell/desktop. Agent open-for-user still uses only `wslview` above.
+`$BROWSER` and xdg mime stay WSL Chrome for interactive shell/desktop. 点名 Windows Chrome 时用 `/usr/local/bin/windows-chrome`，本地文件先 `wslpath -w`。
 
-## OpenCLI
-
-`OPENCLI_PROFILE` 从登录壳现查（`~/.config/wsl-env.sh` 会导出）。以 `opencli profile list` / `opencli doctor` 的已连接配置为准，不把配置名写回本文件。
-
-```bash
-bash -lc 'printf "%s\n" "$OPENCLI_PROFILE"'
-opencli profile list
-opencli doctor
-```
-
-扩展连的若和 `$OPENCLI_PROFILE` 不同：`opencli profile use <id>` 并改 `~/.config/wsl-env.sh`，用新的 login shell 验证。
-
-用户点名站点抓取时走 `fetch-media`。
-
-## Verification
-
-[`../scripts/query.sh`](../scripts/query.sh) `browser`。
-
-Done when agent open uses `wslview` only; interactive mime still points at `wsl-google-chrome.desktop` when that layer is in scope; WSL Chrome launcher still carries proxy flags; automation stays off `ARK`; and `opencli doctor` passes when OpenCLI is in scope.
+Done when interactive mime still points at `wsl-google-chrome.desktop` when that layer is in scope; WSL Chrome launcher still carries proxy flags; automation stays off `ARK`.

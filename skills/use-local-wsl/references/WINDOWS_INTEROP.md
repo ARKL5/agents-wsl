@@ -1,6 +1,6 @@
 # Local Windows Interop
 
-从 WSL 调 Windows 路径和 `.exe`。发行版身份见 [`LOCAL_WSL.md`](LOCAL_WSL.md)。Windows agent 进 Linux 的命令见 `use-local-windows` 的 `WSL_INTEROP.md`。
+从 WSL 调 Windows 路径和 `.exe`。身份在 skill 的 Always。Windows agent 进 Linux 的命令见 `use-local-windows` 的 `WSL_INTEROP.md`。
 
 ## Filesystems
 
@@ -46,7 +46,5 @@ PowerShell 接受当前 `\\wsl.localhost\Ubuntu\...` 提供程序路径。`cmd.e
 ```bash
 /mnt/c/Windows/explorer.exe "$(wslpath -w /home/ark/CODE)"
 ```
-
-给人打开 URL 或本地文件：`wslview` → [`BROWSER_ROUTING.md`](BROWSER_ROUTING.md)。
 
 Done when every path in this run went through `wslpath` or an absolute `.exe` listed above.
