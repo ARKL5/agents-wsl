@@ -21,7 +21,7 @@
 | 约定 | 说明 |
 | --- | --- |
 | 权限 | 全开 |
-| 委派 | 总闸开。内置 `plan` / `general` / `explore` 不关；关了会从 agents 列表拿掉，但这是会用的面 |
+| 委派 | 总闸开。子 agent 仅保留 `general`（使用 `cliproxy/grok-4.7-build-fast:medium`）；点名关闭 `explore`；`plan` 留下 |
 | 插件 | 本家不装用户插件；MCP 默认不装 |
 | 其余面 | 留下。按占法列过、未再点名关的不再关 |
 
