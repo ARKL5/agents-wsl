@@ -10,27 +10,27 @@ Create the `docs/adr/` directory lazily: only when the first ADR is needed.
 # {Short title of the decision}
 
 {1-3 sentences: what's the context, what did we decide, and why.}
-
-**Code**: `{path or Symbol}`
 ```
 
-That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why*, not in filling out sections. `Code` points at the territory that embodies the decision.
-
-## Optional sections
-
-Only include these when they add genuine value. Most ADRs won't need them.
-
-- **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`): useful when decisions are revisited
-- **Considered Options**: only when the rejected alternatives are worth remembering
-- **Consequences**: only when non-obvious downstream effects need to be called out
+That's it. An ADR is a single paragraph. The value is in recording *that* a decision was made and *why*, not in filling out sections.
 
 ## Numbering
 
 Scan `docs/adr/` for the highest existing number and increment by one.
 
-## What qualifies
+## The Contrast Test
 
-When the three conditions in the skill all hold. Examples:
+Code only records the survivor; it never records the discarded paths. An ADR qualifies only when all three hold:
+
+1. **Hard to reverse**: The cost of changing later is meaningful (lock-in, storage migrations, architectural boundaries).
+2. **Surprising without context (The road not taken)**: A reasonable developer or agent reading the code would wonder "why did they do it this way?" and attempt to "fix" or refactor it into an obvious standard. The ADR defends deliberate deviations.
+3. **The result of a real trade-off**: Genuine alternatives were evaluated and rejected for specific reasons, or invisible external constraints (compliance, hardware ceilings, upstream partner bugs) dictated the choice.
+
+## The changelog filter
+
+If a reasonable developer inspecting the code would find the implementation natural and unsurprising, **do not write an ADR**. Feature additions, standard bug fixes, and routine refactors belong in commit logs, not `docs/adr/`.
+
+## What qualifies
 
 - **Architectural shape.** "We're using a monorepo." "The write model is event-sourced, the read model is projected into Postgres."
 - **Integration patterns between contexts.** "Ordering and Billing communicate via domain events, not synchronous HTTP."

@@ -1,50 +1,32 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a CONTEXT.md, or recording or editing an ADR.
+description: Crystallise domain terminology into CONTEXT.md and architectural trade-offs into docs/adr/. Use when encountering new domain concepts, fuzzy or conflicting terms, or recording hard-to-reverse decisions.
 ---
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Actively capture and crystallise a project's domain model as you design and build. This skill strictly creates and appends: it catches terms and architectural decisions the moment they emerge, writes them down inline, and never defers them.
 
-## File structure
+(Merely reading `CONTEXT.md` is a baseline reading habit; this skill is for writing and appending.)
 
-Single context: `CONTEXT.md` at the repo root, ADRs in `docs/adr/`.
+## Targets
 
-Multiple contexts: a root `CONTEXT-MAP.md` points to each context's `CONTEXT.md`. ADRs live in that context's `docs/adr/`, or in the root `docs/adr/` when the decision is system-wide.
+- **Domain terms**: append to `CONTEXT.md` at the repo root. Follow [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md).
+- **Architectural decisions**: append to `docs/adr/`. Follow [ADR-FORMAT.md](ADR-FORMAT.md).
 
-Create files lazily: only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Create targets lazily: create `CONTEXT.md` at repo root when the first term crystallises; create `docs/adr/` when the first ADR is written.
 
-## During the session
+## Steps
 
-### Challenge against the glossary
+1. **Probe.** Watch conversation and code for domain signals:
+   - **New concepts**: a domain entity, role, or relationship appears without a definition in `CONTEXT.md`.
+   - **Fuzzy or conflicting language**: overloaded words, synonyms, or a mismatch between spoken terms and code identifiers. Align on a single canonical term (the symbol used in code) and identify aliases to avoid.
+   - **Irreversible decisions**: an architectural or technology choice that meets the 3-condition bar in [ADR-FORMAT.md](ADR-FORMAT.md) (hard to reverse, surprising without context, real trade-off). If any condition is missing, skip the ADR.
+2. **Crystallise.** Write the entry down immediately:
+   - **For a term**: append to `CONTEXT.md` following [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md). Define the business reality, not code structure, in 1-2 sentences. Always include `_Avoid_` aliases.
+   - **For an ADR**: write `docs/adr/NNNN-slug.md` (increment highest number) following [ADR-FORMAT.md](ADR-FORMAT.md). State context, decision, and why in 1-3 sentences.
+3. **Verify.** Confirm the addition is complete:
+   - Glossary entry passes the code-independence test and carries `_Avoid_` aliases.
+   - ADR qualifies under the contrast test.
 
-When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y. Which is it?"
-
-### Sharpen fuzzy language
-
-When the user uses vague or overloaded terms, propose a precise canonical term. The canonical term is the identifier already in the code (or the identifier you will add). "You're saying 'account': do you mean the Customer or the User? Those are different things."
-
-### Discuss concrete scenarios
-
-When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
-
-### Cross-reference with code
-
-When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
-
-### Update CONTEXT.md inline
-
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up: capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
-
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
-
-### Offer ADRs sparingly
-
-Only offer to create an ADR when all three are true:
-
-1. **Hard to reverse**: the cost of changing your mind later is meaningful
-2. **Surprising without context**: a future reader will wonder "why did they do it this way?"; an agent will treat the code as a smell and rewrite it
-3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
-
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md). Each ADR includes a `Code` pointer to the symbol or path that embodies the decision.
+Finish when the resolved term or ADR is written to disk and verified against its format.
