@@ -11,7 +11,7 @@
 ## 表面
 
 - `~/.pi/agent/settings.json`（信任、MCP 是否安装）
-- 现查：同上。扩展、SSRF 见下方「更新 / 修复」
+- 现查：同上。扩展见下方「更新 / 修复」
 
 ## 家私
 
@@ -31,7 +31,7 @@
 | 扩展 | 只留 FFF、Multi-skills、`pi-web-access` |
 | Multi-skills | 本地扩展：提示内 `$skill-a $skill-b …` 原子加载已注册 skill（含 user-only） |
 | FFF | `@ff-labs/pi-fff` 不钉版本。`PI_FFF_MODE=override`；家目录扫描关；`PI_FFF_MULTIGREP` 保持未设。env 落点 `~/.config/pi-env.sh` |
-| 联网 | `pi-web-access` 不钉版本。本地 SSRF 适配（Clash fake-IP） |
+| 联网 | `pi-web-access` 不钉版本 |
 
 ## 关键路径
 
@@ -54,12 +54,6 @@
 仅当用户点名更新、修复、装卸包或改约定时走这里。投影表面不必跑。
 
 优先单包更新；批量 flags 现查 `pi update --help`。源字符串带 `@版本` 的 npm 包通常不参加批量更新——以 `pi list` 为准。
-
-fake-IP 重放 [`assets/pi-web-access/reapply-adaptation.sh`](../assets/pi-web-access/reapply-adaptation.sh)。
-
-**Multi-skills**：运行时 `~/.pi/agent/extensions/multi-skills.ts`；镜像 `assets/extensions/multi-skills.ts`。
-
-**pi-web-access / fake-IP**：期望片段 `assets/pi-web-access/web-search.json`（`ssrf.allowRanges` 含 `198.18.0.0/15`）；重放脚本写入 live `~/.pi/agent/web-search.json`（无该文件时从 `~/.pi/web-search.json` 种子），合并、不覆盖用户其它字段。Done：读 live 文件含该段。
 
 FFF 斜杠 `/fff-health` · `/fff-rescan` · `/fff-mode` 以现查为准。新会话以 `~/.config/pi-env.sh` 为准。
 
