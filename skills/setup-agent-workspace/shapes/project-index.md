@@ -1,4 +1,4 @@
-<!-- Use this structure when initializing a new project's index. Keep only sections with content. -->
+<!-- Use this structure when initializing a new project's index. Keep the glossary and ADR lines; they are the repository's context structure. Keep other sections only when they have content. -->
 
 # Project
 
@@ -6,13 +6,13 @@
 
 ## Required reading
 
-<!-- Documents with reading triggers only. -->
-
-**Engineering standards** (before code or design changes, and during review): [`docs/agents/engineering-standards.md`](docs/agents/engineering-standards.md)
+<!-- Glossary and ADR lines stay. Include the engineering-standards line only when that file was created. -->
 
 **Glossary** (when using or changing domain names): [`CONTEXT.md`](CONTEXT.md)
 
 **ADRs** (in the area you're touching): [`docs/adr/`](docs/adr/)
+
+**Engineering standards** (before code or design changes, and during review): [`docs/agents/engineering-standards.md`](docs/agents/engineering-standards.md)
 
 ## Verification
 
