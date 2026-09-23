@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
-"""Pull this tree. On Windows, replace the shared set with wsl/main."""
+"""Synchronize shared skills across .agents repositories."""
 from pathlib import Path
 import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL = ("shared-skills.txt", "AGENTS.md", "tools")
+WIN_TREE = Path("/mnt/c/Users/38993/.agents")
 
 
-def git(*args: str) -> tuple[int, str, str]:
+def git(cwd: Path, *args: str) -> tuple[int, str, str]:
     r = subprocess.run(
         ["git", *args],
-        cwd=ROOT,
+        cwd=cwd,
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -20,17 +21,17 @@ def git(*args: str) -> tuple[int, str, str]:
     return r.returncode, r.stdout.strip(), r.stderr.strip()
 
 
-def must(*args: str) -> str:
-    rc, out, err = git(*args)
+def must(cwd: Path, *args: str) -> str:
+    rc, out, err = git(cwd, *args)
     if rc != 0:
-        raise SystemExit(err or out or f"git {' '.join(args)} failed")
+        raise SystemExit(err or out or f"git {' '.join(args)} failed in {cwd}")
     return out
 
 
-def shared_names(ref: str) -> list[str]:
-    rc, out, err = git("show", f"{ref}:shared-skills.txt")
+def shared_names(cwd: Path, ref: str) -> list[str]:
+    rc, out, err = git(cwd, "show", f"{ref}:shared-skills.txt")
     if rc != 0:
-        raise SystemExit(err or f"no shared-skills.txt on {ref}")
+        return []
     return [
         line.strip()
         for line in out.splitlines()
@@ -38,55 +39,98 @@ def shared_names(ref: str) -> list[str]:
     ]
 
 
-def overlay(names: list[str]) -> None:
-    paths = [*PROTOCOL, *(f"skills/{name}" for name in names)]
-    # tools/ stays: this file may be the running script. skills/ is rm'd so
-    # unreadable working-tree files (broken ACLs) cannot block checkout.
-    rm_paths = [p for p in paths if p != "tools"]
-    rc, out, err = git("rm", "-rf", "--ignore-unmatch", "--", *rm_paths)
-    if rc != 0:
-        git("reset", "--hard", "HEAD")
-        raise SystemExit(f"git rm failed, reset to HEAD:\n{err or out}")
-    rc, out, err = git("checkout", "wsl/main", "--", *paths)
-    if rc != 0:
-        git("reset", "--hard", "HEAD")
-        raise SystemExit(f"overlay failed, reset to HEAD:\n{err or out}")
+def ref_has_path(cwd: Path, ref: str, path: str) -> bool:
+    rc, _, _ = git(cwd, "cat-file", "-e", f"{ref}:{path}")
+    return rc == 0
 
 
-def check() -> int:
+def overlay(target_repo: Path, source_ref: str, commit_msg: str = "sync: shared set from wsl/main") -> None:
+    new_names = shared_names(target_repo, source_ref)
+    if not new_names:
+        print(f"[{target_repo.name}] no shared skills found in {source_ref}, skip overlay")
+        return
+    old_names = shared_names(target_repo, "HEAD")
+
+    # 1. Clean dropped shared skills (prevent ghost skills)
+    dropped_skills = set(old_names) - set(new_names)
+
+    # 2. Check protocol files on source_ref (only checkout what actually exists on source)
+    checkout_paths = [p for p in PROTOCOL if ref_has_path(target_repo, source_ref, p)]
+
+    # 3. Add active shared skills to checkout list
+    for name in new_names:
+        checkout_paths.append(f"skills/{name}")
+
+    # 4. Remove active skills and dropped skills before checkout
+    # tools/ stays in working tree during rm to avoid breaking running script
+    rm_paths = [*(f"skills/{name}" for name in dropped_skills), *[p for p in checkout_paths if p != "tools"]]
+    if rm_paths:
+        rc, out, err = git(target_repo, "rm", "-rf", "--ignore-unmatch", "--", *rm_paths)
+        if rc != 0:
+            git(target_repo, "reset", "--hard", "HEAD")
+            raise SystemExit(f"git rm failed in {target_repo}, reset to HEAD:\n{err or out}")
+
+    # 5. Check out clean copies from source_ref
+    rc, out, err = git(target_repo, "checkout", source_ref, "--", *checkout_paths)
+    if rc != 0:
+        git(target_repo, "reset", "--hard", "HEAD")
+        raise SystemExit(f"overlay failed in {target_repo}, reset to HEAD:\n{err or out}")
+
+    # 6. Check if any previously tracked protocol files were deleted in source_ref
+    for old_proto in ("CONTEXT.md", "docs", "docs/adr"):
+        if ref_has_path(target_repo, "HEAD", old_proto) and not ref_has_path(target_repo, source_ref, old_proto):
+            git(target_repo, "rm", "-rf", "--ignore-unmatch", "--", old_proto)
+
+    # 7. Check staged changes and commit
+    _, staged, _ = git(target_repo, "diff", "--cached", "--stat")
+    if staged:
+        print(f"[{target_repo.name}] overlay {len(new_names)} shared skills ({len(dropped_skills)} dropped):")
+        print(staged)
+        must(target_repo, "commit", "-m", commit_msg)
+        print(f"[{target_repo.name}] [ok] committed")
+    else:
+        print(f"[{target_repo.name}] [ok] already matched shared set")
+
+
+def check(repo: Path) -> int:
     r = subprocess.run(
-        [sys.executable, str(ROOT / "tools" / "check.py")],
-        cwd=ROOT,
+        [sys.executable, str(repo / "tools" / "check.py")],
+        cwd=repo,
     )
     return r.returncode
 
 
 def main() -> int:
-    print("=== .agents sync ===")
-    _, dirty, _ = git("status", "--porcelain")
+    print(f"=== .agents sync ({ROOT.name}) ===")
+    _, dirty, _ = git(ROOT, "status", "--porcelain")
     if dirty:
-        print("[warn] dirty working tree:\n" + dirty)
-    rc, out, err = git("pull", "--ff-only")
-    print(f"[ok] pull {out}" if rc == 0 else f"[warn] pull: {err or out}")
+        print(f"[{ROOT.name}] [warn] dirty working tree:\n" + dirty)
+    rc, out, err = git(ROOT, "pull", "--ff-only")
+    print(f"[{ROOT.name}] [ok] pull {out}" if rc == 0 else f"[{ROOT.name}] [warn] pull: {err or out}")
 
-    remotes = git("remote")[1].split()
-    if "wsl" not in remotes:
-        print("[ok] no wsl remote; source tree, skip overlay")
+    remotes = git(ROOT, "remote")[1].split()
+
+    if "wsl" in remotes:
+        # Running on Windows standalone worktree
+        must(ROOT, "fetch", "wsl")
+        overlay(ROOT, "wsl/main")
     else:
-        must("fetch", "wsl")
-        names = shared_names("wsl/main")
-        print(f"overlay {len(names)} shared skills from wsl/main")
-        overlay(names)
-        _, staged, _ = git("diff", "--cached", "--stat")
-        if staged:
-            print(staged)
-            must("commit", "-m", "sync: shared set from wsl/main")
-            print("[ok] committed")
-        else:
-            print("[ok] already matched wsl/main shared set")
+        # Running on WSL (source worktree)
+        print(f"[{ROOT.name}] [ok] source tree")
+        if WIN_TREE.is_dir() and (WIN_TREE / ".git").is_dir() and WIN_TREE.resolve() != ROOT.resolve():
+            print(f"=== syncing Windows tree at {WIN_TREE} ===")
+            _, win_dirty, _ = git(WIN_TREE, "status", "--porcelain")
+            if win_dirty:
+                print(f"[{WIN_TREE.name}] [warn] dirty working tree:\n" + win_dirty)
+            # Fetch local WSL tree into Windows git
+            must(WIN_TREE, "fetch", str(ROOT), "HEAD")
+            overlay(WIN_TREE, "FETCH_HEAD", commit_msg="sync: shared set from wsl")
+            rc_win = check(WIN_TREE)
+            if rc_win != 0:
+                return rc_win
 
-    print("check...")
-    rc = check()
+    print(f"[{ROOT.name}] check...")
+    rc = check(ROOT)
     if rc != 0:
         return rc
     print("=== done ===")

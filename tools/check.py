@@ -28,6 +28,9 @@ def main():
         name=m.group(1).strip().strip("'\"") if m else None
         if name != d.name or not name or not NAME_RE.fullmatch(name): errors.append(f"{md}: invalid name {name!r}")
         disabled=bool(re.search(r"^disable-model-invocation:\s*true\s*$", fm, re.M))
+        has_desc=bool(re.search(r"^description:\s*(?:[^\s#\n]+.*|>\S*|\|\S*)", fm, re.M))
+        if not disabled and not has_desc:
+            errors.append(f"{md}: model-invoked skill missing description")
         y=d/"agents"/"openai.yaml"
         if disabled and (not y.is_file() or not re.search(r"allow_implicit_invocation:\s*false", y.read_text(encoding="utf-8"))):
             errors.append(f"{d}: user-invoked skill lacks allow_implicit_invocation: false")
