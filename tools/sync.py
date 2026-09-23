@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-PROTOCOL = ("shared-skills.txt", "AGENTS.md", "CONTEXT.md", "docs/adr", "tools")
+PROTOCOL = ("shared-skills.txt", "AGENTS.md", "tools")
 
 
 def git(*args: str) -> tuple[int, str, str]:

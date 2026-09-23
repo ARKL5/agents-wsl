@@ -26,7 +26,7 @@ disable-model-invocation: true
 
 1. **列包。** `npx skills add <source> -l`。完成：要装的名字在列表里。
 2. **写入。** 本侧：在 `~/.agents` 下 `npx skills add <source> --skill <name> -g -y`。项目：在该项目根下 `npx skills add <source> --skill <name> -y`。只装点名那一个。装完其它位置若出现该 skill 的副本或 symlink 则删，只留选定 `.agents` 这一处。`.skill-lock.json` 随安装更新。完成：磁盘上该 skill 只有这一处。
-3. **本侧收尾。** 仅本侧：默认不进 `shared-skills.txt`，用户点名共享才加（准入见 `docs/adr/`）；提交规则同 **改**；跑 `uv run tools/check.py`。项目跳过。完成：本侧已校验，或本步已跳过。
+3. **本侧收尾。** 仅本侧：默认不进 `shared-skills.txt`，用户点名共享才加（准入：可移植且对侧会用）；提交规则同 **改**；跑 `uv run tools/check.py`。项目跳过。完成：本侧已校验，或本步已跳过。
 
 完成：点名 skill 在选定落点；本侧则校验已跑；无关脏文件仍在则列出。
 
