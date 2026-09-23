@@ -41,7 +41,7 @@ When a fetch tool reports SSRF / private IP in `198.18.0.0/15`:
 
 1. Confirm the same URL via curl through the discovered mixed port.
 2. Treat it as Fake-IP vs that tool's SSRF list, not as a dead proxy.
-3. Per-tool allowlist lives with the tool, not in `no_proxy`. Pi: restore via `configure-harness` `assets/pi-web-access/reapply-adaptation.sh`. Grok uses `web_search` (Responses API); `web_fetch` is not a repair surface.
+3. Per-tool allowlist lives with the tool, not in `no_proxy`. Grok uses `web_search` (Responses API); `web_fetch` is not a repair surface.
 
 ## Verification order
 
