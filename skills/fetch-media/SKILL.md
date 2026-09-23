@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 空结果、桥失败、登录墙按该支完成条件报告即可。
 
-走 OpenCLI（复用已登录 Windows Chrome）。命令与会话 **live-check**（`opencli doctor`）。哪份 Chrome、桥怎么连，以本机 use-local 的浏览器合同为准。输出 `-f yaml`。默认只读；写操作（评论、关注、点赞、登录、打招呼、发消息）只有用户当次点名才做。登录态只经 OpenCLI 桥。
+走 OpenCLI（复用已登录 Windows Chrome）。命令与会话以 `opencli doctor`、`opencli profile list` 的已连接配置为准。输出 `-f yaml`。默认只读；写操作（评论、关注、点赞、登录、打招呼、发消息）只有用户当次点名才做。登录态只经 OpenCLI 桥。
 
 未点名分支时，按用户给的 URL/平台选一支。对不上这四站则走 **web read**。命令以 `opencli <site> --help` 为准。
 
