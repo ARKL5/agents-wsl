@@ -17,6 +17,7 @@ disable-model-invocation: true
 | **opencode** | [references/opencode.md](references/opencode.md) |
 | **codex** | [references/codex.md](references/codex.md) |
 | **agy** | [references/agy.md](references/agy.md) |
+| **claude-code** | [references/claude-code.md](references/claude-code.md) |
 
 cliproxy 接入与更新走 `cli-proxy-api`。本 skill 只写 WSL 家目录，不写 Windows。型号与 effort 以 live 为准，除非这轮用户要改；不写回 skill。
 
