@@ -7,6 +7,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL = ("shared-skills.txt", "AGENTS.md", "tools")
 WIN_TREE = Path("/mnt/c/Users/38993/.agents")
+CLAUDE_SKILLS = Path.home() / ".claude" / "skills"
 
 
 def git(cwd: Path, *args: str) -> tuple[int, str, str]:
@@ -92,6 +93,31 @@ def overlay(target_repo: Path, source_ref: str, commit_msg: str = "sync: shared 
         print(f"[{target_repo.name}] [ok] already matched shared set")
 
 
+def link_claude(repo: Path) -> None:
+    """Claude Code only loads ~/.claude/skills; mirror skills/ there as per-skill symlinks."""
+    src = repo / "skills"
+    CLAUDE_SKILLS.mkdir(parents=True, exist_ok=True)
+    linked = skipped = pruned = 0
+    for d in sorted(p for p in src.iterdir() if (p / "SKILL.md").is_file()):
+        link = CLAUDE_SKILLS / d.name
+        if link.is_symlink():
+            if link.resolve() == d.resolve():
+                continue
+            link.unlink()
+        elif link.exists():
+            print(f"[claude] [warn] {link} is a real path, skip")
+            skipped += 1
+            continue
+        link.symlink_to(d, target_is_directory=True)
+        linked += 1
+    # Prune links into skills/ whose target is gone
+    for link in CLAUDE_SKILLS.iterdir():
+        if link.is_symlink() and not link.exists() and Path(link.readlink()).parent.resolve() == src.resolve():
+            link.unlink()
+            pruned += 1
+    print(f"[claude] [ok] links {CLAUDE_SKILLS}: +{linked} -{pruned} skip {skipped}")
+
+
 def check(repo: Path) -> int:
     r = subprocess.run(
         [sys.executable, str(repo / "tools" / "check.py")],
@@ -117,6 +143,7 @@ def main() -> int:
     else:
         # Running on WSL (source worktree)
         print(f"[{ROOT.name}] [ok] source tree")
+        link_claude(ROOT)
         if WIN_TREE.is_dir() and (WIN_TREE / ".git").is_dir() and WIN_TREE.resolve() != ROOT.resolve():
             print(f"=== syncing Windows tree at {WIN_TREE} ===")
             _, win_dirty, _ = git(WIN_TREE, "status", "--porcelain")
