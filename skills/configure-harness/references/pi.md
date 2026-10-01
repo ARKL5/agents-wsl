@@ -15,7 +15,7 @@
 
 ## 家私
 
-斜杠形态和 agent frontmatter 现查。本机特有：`$skill-…`。
+斜杠形态和 agent frontmatter 现查。
 
 ## 故意约定
 
@@ -28,8 +28,7 @@
 | 安静启动 | `quietStartup` + `collapseChangelog` |
 | MCP | 默认不装；需要时再装 |
 | 委派 | `pi-subagents`（`npm:pi-subagents` 不钉版本）。跨家走 herdr |
-| 扩展 | 只留 FFF、Multi-skills、`pi-web-access`、`pi-subagents` |
-| Multi-skills | 本地扩展：提示内 `$skill-a $skill-b …` 原子加载已注册 skill（含 user-only） |
+| 扩展 | 包只留 FFF、`pi-web-access`、`pi-subagents`（均不钉版本）；本机本地扩展见「关键路径」 |
 | FFF | `@ff-labs/pi-fff` 不钉版本。`PI_FFF_MODE=override`；家目录扫描关；`PI_FFF_MULTIGREP` 保持未设。env 落点 `~/.config/pi-env.sh` |
 | 联网 | `pi-web-access` 不钉版本 |
 
@@ -39,7 +38,10 @@
 ~/.pi/agent/
   settings.json · models.json · auth.json · web-search.json
   agents/
-  extensions/multi-skills.ts
+  extensions/
+    herdr-agent-state.ts   ← herdr 安装并覆盖，勿手改
+    statusline.ts          ← 本机两行状态栏
+    subagent/config.json
   npm/node_modules/…
   fff/
 ~/.config/pi-env.sh
