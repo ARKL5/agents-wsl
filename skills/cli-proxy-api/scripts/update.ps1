@@ -34,9 +34,35 @@ $keeperRoot = Join-Path $env:LOCALAPPDATA 'CPAUsageKeeper'
 
 function Get-YamlPort([string]$Path, [int]$Default) {
     if (-not (Test-Path -LiteralPath $Path)) { return $Default }
-    foreach ($line in Get-Content -LiteralPath $Path) {
-        if ($line -match '^port:\s*["'']?(\d+)') { return [int]$Matches[1] }
+    $stack = New-Object System.Collections.Generic.List[object]
+    $serverPort = $null
+    $rootPort = $null
+    foreach ($raw in Get-Content -LiteralPath $Path) {
+        if ($raw -match '^\s*(#|$)') { continue }
+        $indent = 0
+        foreach ($ch in $raw.ToCharArray()) {
+            if ($ch -eq ' ') { $indent++ }
+            elseif ($ch -eq "`t") { $indent += 2 }
+            else { break }
+        }
+        $trimmed = $raw.Trim()
+        if ($trimmed.StartsWith('- ')) { continue }
+        if ($trimmed -notmatch '^([^:#]+):(.*)$') { continue }
+        $key = $Matches[1].Trim().Trim('"').Trim("'")
+        $val = $Matches[2].Trim().Trim('"').Trim("'")
+        while ($stack.Count -gt 0 -and $stack[$stack.Count - 1].Indent -ge $indent) {
+            $stack.RemoveAt($stack.Count - 1)
+        }
+        $parent = ''
+        if ($stack.Count -gt 0) { $parent = (($stack | ForEach-Object { $_.Key }) -join '.') }
+        $stack.Add([pscustomobject]@{ Indent = $indent; Key = $key })
+        if ($key -eq 'port' -and $val -match '^\d+$') {
+            if ($parent -eq 'server') { $serverPort = [int]$val }
+            elseif ($parent -eq '') { $rootPort = [int]$val }
+        }
     }
+    if ($null -ne $serverPort) { return $serverPort }
+    if ($null -ne $rootPort) { return $rootPort }
     return $Default
 }
 

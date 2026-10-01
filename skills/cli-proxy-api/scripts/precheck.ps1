@@ -93,6 +93,19 @@ if (-not (Test-Path -LiteralPath $cfgPath)) {
     exit 1
 }
 
+function Unquote-Scalar([string]$Value) {
+    if ($null -eq $Value) { return '' }
+    $v = $Value.Trim()
+    if ($v.Length -ge 2) {
+        $a = $v[0]
+        $b = $v[$v.Length - 1]
+        if (($a -eq '"' -and $b -eq '"') -or ($a -eq "'" -and $b -eq "'")) {
+            return $v.Substring(1, $v.Length - 2)
+        }
+    }
+    return $v
+}
+
 $hostName = '127.0.0.1'
 $port = 8317
 $tlsEnable = $false
@@ -101,32 +114,101 @@ $authDir = 'auths'
 $keys = New-Object System.Collections.Generic.List[string]
 $subtypes = New-Object System.Collections.Generic.List[string]
 $upstream = New-Object System.Collections.Generic.List[string]
-$section = ''
+$scalars = @{}
+$seen = @{}
+$stack = New-Object System.Collections.Generic.List[object]
+$accessKeys = New-Object System.Collections.Generic.List[string]
+$legacyKeys = New-Object System.Collections.Generic.List[string]
+$serverSubtypes = New-Object System.Collections.Generic.List[string]
+$legacySubtypes = New-Object System.Collections.Generic.List[string]
+$apiKeysIsMap = $false
+$scalarPaths = @(
+    'server.host', 'host',
+    'server.port', 'port',
+    'server.tls.enable', 'tls.enable',
+    'multimedia.disable-image-generation', 'disable-image-generation',
+    'oauth.auth-dir', 'auth-dir'
+)
 
 foreach ($raw in Get-Content -LiteralPath $cfgPath) {
-    if ($raw -match '^(\S[^:]*):') {
-        $section = $Matches[1]
-        if ($section -match '^.+-api-key$' -or $section -eq 'openai-compatibility' -or $section -eq 'remote-management') {
-            if (-not $upstream.Contains($section)) { $upstream.Add($section) }
+    if ($raw -match '^\s*(#|$)') { continue }
+    $indent = 0
+    foreach ($ch in $raw.ToCharArray()) {
+        if ($ch -eq ' ') { $indent++ }
+        elseif ($ch -eq "`t") { $indent += 2 }
+        else { break }
+    }
+    $trimmed = $raw.Trim()
+    if ($trimmed.StartsWith('- ')) {
+        $path = ''
+        if ($stack.Count -gt 0) { $path = (($stack | ForEach-Object { $_.Key }) -join '.') }
+        $item = $trimmed.Substring(2).Trim()
+        $scalar = $null
+        if ($item -match '^(?:"([^"]*)"|''([^'']*)''|(\S+))\s*$') {
+            $scalar = $Matches[1]
+            if (-not $scalar) { $scalar = $Matches[2] }
+            if (-not $scalar) { $scalar = $Matches[3] }
         }
+        if ([string]::IsNullOrWhiteSpace($scalar)) { continue }
+        $scalar = $scalar.Trim()
+        if ($path -eq 'access.api-keys') { $accessKeys.Add($scalar) }
+        elseif ($path -eq 'api-keys') { $legacyKeys.Add($scalar) }
+        elseif ($path -eq 'server.discovery.subtypes') { $serverSubtypes.Add($scalar) }
+        elseif ($path -eq 'discovery.subtypes') { $legacySubtypes.Add($scalar) }
+        continue
     }
-    if ($raw -match '^host:\s*["'']?([^"'']+)["'']?\s*$') { $hostName = $Matches[1].Trim() }
-    if ($raw -match '^port:\s*["'']?(\d+)') { $port = [int]$Matches[1] }
-    if ($raw -match '^disable-image-generation:\s*["'']?([^"'']+)["'']?\s*$') {
-        $imagePolicy = $Matches[1].Trim()
+    if ($trimmed -notmatch '^([^:#]+):(.*)$') { continue }
+    $key = (Unquote-Scalar $Matches[1].Trim())
+    if ([string]::IsNullOrWhiteSpace($key)) { continue }
+    $val = $Matches[2]
+    while ($stack.Count -gt 0 -and $stack[$stack.Count - 1].Indent -ge $indent) {
+        $stack.RemoveAt($stack.Count - 1)
     }
-    if ($raw -match '^auth-dir:\s*["'']?([^"'']+)["'']?\s*$') { $authDir = $Matches[1].Trim() }
-    if ($section -eq 'tls' -and $raw -match '^\s+enable:\s*(true|false)') {
-        $tlsEnable = ($Matches[1] -eq 'true')
+    $parent = ''
+    if ($stack.Count -gt 0) { $parent = (($stack | ForEach-Object { $_.Key }) -join '.') }
+    $stack.Add([pscustomobject]@{ Indent = $indent; Key = $key })
+    $path = if ($parent) { "$parent.$key" } else { $key }
+    $seen[$path] = $true
+    if ($scalarPaths -contains $path) {
+        $parsed = Unquote-Scalar $val
+        if (-not [string]::IsNullOrWhiteSpace($parsed)) { $scalars[$path] = $parsed.Trim() }
     }
-    if ($section -eq 'api-keys' -and $raw -match '^\s+-\s+(?:"([^"]*)"|''([^'']*)''|(\S+))\s*$') {
-        $val = $Matches[1]; if (-not $val) { $val = $Matches[2] }; if (-not $val) { $val = $Matches[3] }
-        if (-not [string]::IsNullOrWhiteSpace($val)) { $keys.Add($val.Trim()) }
+    if ($parent -eq '' -and ($key -match '^.+-api-key$' -or $key -eq 'openai-compatibility' -or $key -eq 'remote-management' -or $key -eq 'management')) {
+        if (-not $upstream.Contains($key)) { $upstream.Add($key) }
     }
-    if ($section -eq 'discovery' -and $raw -match '^\s+-\s+["'']?([^"'']+)["'']?\s*$') {
-        $st = $Matches[1].Trim()
-        if ($st) { $subtypes.Add($st) }
+    if ($parent -eq 'api-keys') {
+        $apiKeysIsMap = $true
+        $field = 'api-keys.' + $key
+        if (-not $upstream.Contains($field)) { $upstream.Add($field) }
     }
+}
+
+if ($scalars.ContainsKey('server.host')) { $hostName = [string]$scalars['server.host'] }
+elseif ($scalars.ContainsKey('host')) { $hostName = [string]$scalars['host'] }
+$pickedPort = $null
+if ($scalars.ContainsKey('server.port')) { $pickedPort = [string]$scalars['server.port'] }
+elseif ($scalars.ContainsKey('port')) { $pickedPort = [string]$scalars['port'] }
+if ($pickedPort -match '^\d+$') { $port = [int]$pickedPort }
+$pickedTls = $null
+if ($scalars.ContainsKey('server.tls.enable')) { $pickedTls = [string]$scalars['server.tls.enable'] }
+elseif ($scalars.ContainsKey('tls.enable')) { $pickedTls = [string]$scalars['tls.enable'] }
+if ($pickedTls) { $tlsEnable = ($pickedTls.ToLowerInvariant() -eq 'true') }
+if ($scalars.ContainsKey('multimedia.disable-image-generation')) {
+    $imagePolicy = [string]$scalars['multimedia.disable-image-generation']
+} elseif ($scalars.ContainsKey('disable-image-generation')) {
+    $imagePolicy = [string]$scalars['disable-image-generation']
+}
+if ($scalars.ContainsKey('oauth.auth-dir')) { $authDir = [string]$scalars['oauth.auth-dir'] }
+elseif ($scalars.ContainsKey('auth-dir')) { $authDir = [string]$scalars['auth-dir'] }
+if ($seen.ContainsKey('access.api-keys')) {
+    $keys = $accessKeys
+} elseif ($seen.ContainsKey('api-keys') -and -not $apiKeysIsMap) {
+    $keys = $legacyKeys
+}
+if ($seen.ContainsKey('server.discovery.subtypes')) {
+    $subtypes = $serverSubtypes
+} elseif ($seen.ContainsKey('discovery.subtypes')) {
+    $subtypes = $legacySubtypes
 }
 
 $clientHost = $hostName
