@@ -1,71 +1,38 @@
 ---
 name: improve-codebase-architecture
-description: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
+description: Identify evidence-backed architectural improvements and compare their benefits, migration costs, and risks.
 disable-model-invocation: true
 ---
 
 # Improve Codebase Architecture
 
-Surface architectural friction and propose **deepening opportunities**: refactors that turn shallow modules into deep ones. The aim is testability and AI-navigability.
+Find structural costs worth addressing, not refactors to fill a report. Use `codebase-design` for design judgments; deepening a module is one possible remedy, not the predetermined answer.
 
-This command is _informed_ by the project's domain model and built on a shared design vocabulary:
+## 1. Explore the relevant structure
 
-- Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
-- The project's domain glossary gives names to good seams; ADRs record decisions this command should not re-litigate.
+Start with the user's named area or pain point. Otherwise, use recent changes, defects, and repeated modification patterns to choose where to investigate. Change frequency is a lead, not proof that the architecture needs repair. State the inspected scope.
 
-## Process
+Read relevant project instructions, domain terms, and ADRs when present. Trace actual callers, responsibilities, dependencies, and tests. Look for concrete friction: repeated coordination by callers, knowledge that changes in several places, independent responsibilities that are entangled, or important behavior that is costly to understand or verify.
 
-### 1. Explore
+Investigate directly or use authorized delegation where it adds value. Complete when each suspected problem has code evidence and an explanation of its consequences, rather than merely a label such as shallow, coupled, or untested.
 
-**Scope before you scan: YAGNI.** Deepening a module pays off by making future changes to it easier, so put extra weight on the parts of the codebase that have recently changed. Decide *where* to look before you look:
+## 2. Present worthwhile candidates
 
-- If the user named a direction (a module, a subsystem, a pain point), take it, and skip the inference below.
-- Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots, the files and areas that keep coming up, and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
+Default to a concise comparison in the conversation. Use diagrams when they clarify the structure; a separate visual report is optional, not a required deliverable.
 
-Read the project's domain glossary and any ADRs in the area you're touching first.
+For each worthwhile candidate, explain:
 
-Then spawn a sub-agent to walk the codebase. Don't follow rigid heuristics; explore organically and note where you experience friction:
+- **Evidence and impact**: relevant code locations or change history, the burden they reveal, and who bears it.
+- **Direction and benefit**: what responsibility or interface would change and what complexity it would remove or absorb.
+- **Cost and risk**: affected callers and contracts, migration effort, and uncertainty that could change the recommendation.
+- **Verification**: how to show that behavior is preserved and the claimed improvement is real.
 
-- Where does understanding one concept require bouncing between many small modules?
-- Where are modules **shallow**, with an interface nearly as complex as the implementation?
-- Where have pure functions been extracted just for testability, but the real bugs hide in how they're called (no **locality**)?
-- Where do tightly-coupled modules leak across their seams?
-- Which parts of the codebase are untested, or hard to test through their current interface?
+Compare the benefit with leaving the arrangement in place or making a smaller change. Rank candidates and recommend where to invest first, with reasons. If a candidate conflicts with an ADR, explain the evidence that warrants reconsidering that decision. Distinguish established friction from hypotheses that need further investigation.
 
-Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
+Complete when the user has enough evidence and cost information to choose what, if anything, to explore. If no worthwhile candidate emerges, report that result and the inspection limits rather than manufacturing work.
 
-### 2. Present candidates as an HTML report
+## 3. Explore the selected candidate
 
-Write a self-contained HTML file to the OS temp directory so nothing lands in the repo, named `architecture-review-<timestamp>.html` so each run gets a fresh file. Open it for the user per `use-local-wsl` (BROWSER_ROUTING) and tell them the absolute path.
+Once the user chooses a candidate, examine its constraints, interfaces, migration path, and relevant alternatives. Resolve technical facts yourself; bring consequential trade-offs to the user. Use `domain-modeling` when recording confirmed terms or architectural decisions.
 
-The report uses **Tailwind via CDN** for layout and styling, and **Mermaid via CDN** for diagrams where a graph/flow/sequence reliably communicates the structure. Mix Mermaid with hand-crafted CSS/SVG visuals: use Mermaid when relationships are graph-shaped (call graphs, dependencies, sequences), and hand-built divs/SVG when you want something more editorial (mass diagrams, cross-sections, collapse animations). Each candidate gets a **before/after visualisation**. Be visual.
-
-For each candidate, render a card with:
-
-- **Files**: which files/modules are involved
-- **Problem**: why the current architecture is causing friction
-- **Solution**: plain English description of what would change
-- **Benefits**: explained in terms of locality and leverage, and how tests would improve
-- **Before / After diagram**: side-by-side, custom-drawn, illustrating the shallowness and the deepening
-- **Recommendation strength**: one of `Strong`, `Worth exploring`, `Speculative`, rendered as a badge
-
-End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
-
-**Use the glossary's vocabulary for the domain, and the codebase-design skill's vocabulary for the architecture.** If the glossary defines "Order," talk about "the Order intake module," not "the FooBarHandler," and not "the Order service."
-
-**ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly in the card (e.g. a warning callout: _"contradicts ADR-0007, but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
-
-See [HTML-REPORT.md](HTML-REPORT.md) for the full HTML scaffold, diagram patterns, and styling guidance.
-
-Do NOT propose interfaces yet. After the file is written, ask the user: "Which of these would you like to explore?"
-
-### 3. Grilling loop
-
-Once the user picks a candidate, call the Skill tool with "grilling" to walk the decision tree with them: constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
-
-Side effects happen inline as decisions crystallize; call the Skill tool with "domain-modeling" to keep the domain model current as you go:
-
-- **Naming a deepened module after a concept not in the glossary?** Call the Skill tool with "domain-modeling" to add the term.
-- **Sharpening a fuzzy term during the conversation?** Call the Skill tool with "domain-modeling" to update the glossary right there.
-- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones.
-- **Want to explore alternative interfaces for the deepened module?** Call the Skill tool with "codebase-design" and use its design-it-twice parallel sub-agent pattern.
+Finish when the proposed change, its rationale, costs, verification, and remaining decisions are clear. This skill provides analysis and recommendations; implementing a refactor is a separate user direction.
