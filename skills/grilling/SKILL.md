@@ -1,28 +1,32 @@
 ---
 name: grilling
-description: Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases.
+description: Stress-test a plan, decision, or idea through relentless questioning. Use when the user asks to grill or challenge their thinking.
 ---
 
-Interview the user relentlessly until you reach a shared understanding. Map this as a **design tree**: every decision branches into the decisions that hang off it.
+# Grilling
 
-Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round.
+Challenge assumptions, expose contradictions, and make consequential trade-offs explicit. Be **relentless** where an answer could change the current goal, approach, cost, or risk; depth is not the number of questions asked.
 
-Format a round like so:
+## Decision tree
 
-```
-❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+Track the decisions and their prerequisites as a **design tree**. The **frontier** contains questions whose prerequisites are settled. Recompute it after each answer; questions that depend on an unanswered choice belong to a later round.
 
-➡️ <your recommended answer>
+Concentrate on branches that affect the current decision. Leave nonessential implementation details to implementation, and identify assumptions or uncertainties that matter rather than trying to exhaust every possible branch.
 
----
+## Responsibility
 
-❓ **Q2** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+Establish discoverable facts yourself and distinguish evidence from inference. Investigate simple questions directly; use sub-agents for independent or time-consuming investigations when delegation is authorized. A pending investigation is an unsettled prerequisite: defer its dependent questions while progressing unrelated ones. State unavailable evidence as a gap.
 
-➡️ <your recommended answer>
-```
+The user owns goals, preferences, consequential trade-offs, and risk acceptance. The agent owns fact-finding, analysis, and technical judgments already delegated to it. Ask about choices that need the user's judgment, not routine details the agent can resolve within agreed constraints.
 
-Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
+## Rounds
 
-Finding _facts_ is your job, never the user's. When a frontier question needs a fact from the environment (filesystem, tools, etc.), dispatch a sub-agent to find it; don't ask the user for anything you could look up yourself. Don't block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the sub-agent to report; ask the rest of the frontier now. The _decisions_ are the user's: put each to them and wait.
+Select the highest-impact questions on the frontier that can be answered together. Number them, explain why each matters, and give your recommendation with its decisive reason and relevant alternatives. Keep the round manageable for the discussion rather than asking the whole frontier at once.
 
-The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not act on it until the user confirms you have reached a shared understanding.
+Wait for answers before advancing dependent decisions. Probe vague or inconsistent answers with concrete scenarios and consequences; revise your recommendation when new facts or priorities change its basis. Preserve settled decisions unless new evidence warrants reopening them.
+
+## Completion
+
+Summarize the decisions, their important trade-offs, and remaining uncertainty. Finish when the user agrees that the issues affecting the current decision are sufficiently clear to proceed; explicitly deferred questions stay deferred. If a material choice or prerequisite remains unresolved, identify it instead of claiming consensus.
+
+This skill remains a discussion. Starting implementation is a separate user direction.
