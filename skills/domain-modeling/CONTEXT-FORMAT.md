@@ -25,6 +25,7 @@ _Avoid_: Client, buyer, account
 ## Rules
 
 - **Location.** Single file at the repository root: `CONTEXT.md`. Create it lazily when the first term is resolved.
+- **Maintain one current definition per concept.** Add an entry for a new concept; revise the existing entry in place when its meaning or canonical name is clarified. Merge duplicate entries for the same concept, retaining relevant `_Avoid_` aliases. Resolve unsettled meanings before writing them as canonical definitions.
 - **The code-independence test.** Define the business reality, not the code structure. If a definition mentions database tables, schemas, fields, functions, endpoints, or UI buttons, it is broken: it has degenerated into a cache of the implementation. A non-technical domain expert should understand it completely.
 - **Negative space is mandatory.** Code only reveals the identifiers chosen; it cannot reveal the ones rejected. Every term must carry `_Avoid_` with plausible synonyms an agent or developer might casually introduce. This arrests vocabulary drift before it starts.
 - **Keep definitions tight.** One or two sentences max. Define what it IS, not what it does. The headword is the canonical identifier.
