@@ -1,16 +1,12 @@
 ---
 name: handoff
-description: Compact the current conversation into a handoff document for another agent to pick up.
+description: Preserve the context a fresh agent needs to continue the work.
 argument-hint: "What will the next session be used for?"
 disable-model-invocation: true
 ---
 
-Write a handoff document summarising the current conversation so a fresh agent can continue the work. Always save to `.notes/` in the current workspace.
+Write one handoff document in `.notes/` in the current workspace. Focus it on the next task the user names in their arguments, or on continuing the current work.
 
-Include a "suggested skills" section in the document, naming which skills the next agent should call the Skill tool for.
+Preserve relevant goals, confirmed decisions and authorization boundaries, verified progress, unresolved questions, and the next action. Reference existing artifacts (specs, plans, ADRs, issues, commits, diffs) by path or URL; write only the context they cannot supply. Distinguish verified results from assumptions and work still pending.
 
-Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
-
-Redact any sensitive information, such as API keys, passwords, or personally identifiable information.
-
-If the user passed arguments, treat them as a description of what the next session will focus on and tailor the doc accordingly.
+Complete when a fresh agent can use the document and its references to identify where to resume, the basis for proceeding, and what still requires the user's decision. Return the document's actual path.
