@@ -24,9 +24,10 @@ disable-model-invocation: true
 
 点名来源和 skill 名。未点名先问。点名项目则落到该项目 `.agents/skills/<name>/`；否则 `~/.agents/skills/<name>/`。
 
-1. **列包。** `npx skills add <source> -l`。完成：要装的名字在列表里。
-2. **写入。** 本侧：在 `~/.agents` 下 `npx skills add <source> --skill <name> -g -y`。项目：在该项目根下 `npx skills add <source> --skill <name> -y`。只装点名那一个。装完其它位置若出现该 skill 的副本或 symlink 则删，只留选定 `.agents` 这一处；**同步** 维护的 Claude Code 链接除外。`.skill-lock.json` 随安装更新。完成：磁盘上该 skill 只有这一处。
-3. **本侧收尾。** 仅本侧：默认不进 `shared-skills.txt`，用户点名共享才加（准入：可移植且对侧会用）；提交规则同 **改**；跑 `uv run tools/check.py`。项目跳过。完成：本侧已校验，或本步已跳过。
+1. **列包与基线。** `npx skills add <source> -l`。记录选定落点及安装器可能写入位置的既有同名目录和链接；链接同时记录目标。完成：要装的名字在列表里，安装前基线已记录。
+2. **写入。** 本侧：在 `~/.agents` 下 `npx skills add <source> --skill <name> -g -y`。项目：在该项目根下 `npx skills add <source> --skill <name> -y`。只装点名那一个。`.skill-lock.json` 随安装更新。完成：点名 skill 已写入选定落点。
+3. **清理。** 对照基线，只清理可确认由本次安装新生成、位于选定落点之外的冗余副本或链接。删除链接前核对目标，只删除链接本身；**同步** 维护的 Claude Code 链接保留。既有内容或来源不明的内容保持原样；需要迁移或删除时，列出具体路径并取得用户确认。完成：本次新增冗余项已清理，保留项已记录。
+4. **本侧收尾。** 仅本侧：默认不进 `shared-skills.txt`，用户点名共享才加（准入：可移植且对侧会用）；提交规则同 **改**；跑 `uv run tools/check.py`。项目跳过。完成：本侧已校验，或本步已跳过。
 
 完成：点名 skill 在选定落点；本侧则校验已跑；无关脏文件仍在则列出。
 
