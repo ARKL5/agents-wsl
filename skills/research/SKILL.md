@@ -1,14 +1,19 @@
 ---
 name: research
-description: Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a topic researched, or reading legwork delegated to a background agent.
+description: Dispatch a background researcher to write cited findings in .notes/.
+disable-model-invocation: true
 ---
 
-If you are already the delegated researcher, perform the work below directly; do not spawn another agent. Otherwise, dispatch one **background researcher**, passing the question, scope, workspace, and these research requirements. You may continue other work while it reads; inspect the returned file before reporting the research complete. The caller owns any ticket or map updates.
+# Research
 
-The researcher's work:
+Establish the question and scope from the request; ask only when an ambiguity would change the investigation.
 
-1. Investigate the question against **primary sources** (official docs, source code, specs, first-party APIs), not a secondary write-up of them. Follow every claim back to the source that owns it.
-2. Write the findings to a single Markdown file, citing each claim's source.
-3. Save it in `.notes/` and return the actual file path, with any unresolved questions or source gaps.
+Launch one **background research sub-agent**, passing the question, scope, workspace, and requirements below. The researcher executes them directly without further delegation. If the sub-agent cannot be launched, report the blocker.
 
-Complete when the findings file has been written and checked against the question and primary sources. A dispatch alone is not completion.
+The sub-agent's work:
+
+1. **Investigate.** Follow material claims to the primary source that owns them: official documentation, source code, specifications, or first-party data. Distinguish what the source establishes from your inference. Missing or conflicting evidence is a finding, not permission to guess.
+2. **Record.** Write one Markdown findings file in `.notes/` with source citations for each material claim, an answer to the question, and unresolved questions or evidence limits.
+3. **Check.** Verify that the cited passages support the claims and that the report addresses the requested scope. Return its actual path and remaining gaps; partial research should be reported as partial.
+
+The caller reads and checks the sub-agent's file, then reports its path, conclusion, and remaining gaps to the user without writing a second summary file. Complete when the requested question is answered with supporting evidence; report unresolved scope as partial. Dispatch alone is not completion.
