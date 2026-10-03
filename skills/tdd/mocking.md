@@ -1,59 +1,19 @@
-# When to Mock
+# Dependency Substitution
 
-Mock at **system boundaries** only:
+Choose real dependencies or test substitutes according to the behavior being verified, test cost, and required fidelity. Ownership alone does not determine whether a dependency should be mocked.
 
-- External APIs (payment, email, etc.)
-- Databases (sometimes - prefer test DB)
-- Time/randomness
-- File system (sometimes)
+## Choose the least misleading setup
 
-Don't mock:
+- **Real dependency**: useful when storage, transport, or integration semantics are part of the contract. Prefer an existing local test setup where practical.
+- **Fake or local stand-in**: useful for exercising several behaviors cheaply. Check which production semantics it omits.
+- **Stub**: supplies controlled responses when the test concerns how the caller handles them.
+- **Mock or spy**: observes an interaction when that interaction is an agreed requirement, such as an effect occurring once.
+- **Controlled clock or randomness**: makes a selected time-dependent or probabilistic scenario reproducible.
 
-- Your own classes/modules
-- Internal collaborators
-- Anything you control
+A substitute tests reactions to the behavior it models; it does not prove that the real dependency matches that model. Make relevant fidelity gaps explicit in the test plan. An internal collaborator can be substituted for a concrete isolation need, but mocking every helper risks testing the wiring instead of the behavior.
 
-## Designing for Mockability
+## Keep production responsibilities intact
 
-At system boundaries, design interfaces that are easy to mock:
+Use existing substitution points where possible. Introduce dependency injection or an adapter when it earns its cost through control, isolation, or meaningful verification. Keep internal construction private when callers have no useful choice to make.
 
-**1. Use dependency injection**
-
-Pass external dependencies in rather than creating them internally:
-
-```typescript
-// Easy to mock
-function processPayment(order, paymentClient) {
-  return paymentClient.charge(order.total);
-}
-
-// Hard to mock
-function processPayment(order) {
-  const client = new StripeClient(process.env.STRIPE_KEY);
-  return client.charge(order.total);
-}
-```
-
-**2. Prefer SDK-style interfaces over generic fetchers**
-
-Create specific functions for each external operation instead of one generic function with conditional logic:
-
-```typescript
-// GOOD: Each function is independently mockable
-const api = {
-  getUser: (id) => fetch(`/users/${id}`),
-  getOrders: (userId) => fetch(`/users/${userId}/orders`),
-  createOrder: (data) => fetch('/orders', { method: 'POST', body: data }),
-};
-
-// BAD: Mocking requires conditional logic inside the mock
-const api = {
-  fetch: (endpoint, options) => fetch(endpoint, options),
-};
-```
-
-The SDK approach means:
-- Each mock returns one specific shape
-- No conditional logic in test setup
-- Easier to see which endpoints a test exercises
-- Type safety per endpoint
+Choose domain operations or transport-level interfaces according to the responsibility they serve. A mock that is easy to configure is not, by itself, a reason to reshape production code.

@@ -1,77 +1,36 @@
-# Good and Bad Tests
+# Tests Worth Keeping
 
-## Good Tests
+A test earns its maintenance cost by detecting a meaningful violation of an agreed behavior. Design assertions around that behavior, not the current arrangement of helper functions.
 
-**Integration-style**: Test through real interfaces, not mocks of internal parts.
+## Independent expectations
 
-```typescript
-// GOOD: Tests observable behavior
-test("user can checkout with valid cart", async () => {
-  const cart = createCart();
-  cart.add(product);
-  const result = await checkout(cart, paymentMethod);
-  expect(result.status).toBe("confirmed");
-});
-```
-
-Characteristics:
-
-- Tests behavior users/callers care about
-- Uses public API only
-- Survives internal refactors
-- Describes WHAT, not HOW
-- One logical assertion per test
-
-## Bad Tests
-
-**Implementation-detail tests**: Coupled to internal structure.
+Expected values come from a requirement, contract, worked example, or independent oracle. Recomputing the result with the implementation's algorithm can reproduce the same bug.
 
 ```typescript
-// BAD: Tests implementation details
-test("checkout calls paymentService.process", async () => {
-  const mockPayment = jest.mock(paymentService);
-  await checkout(cart, payment);
-  expect(mockPayment.process).toHaveBeenCalledWith(cart.total);
-});
+// Weak: repeats the calculation under test.
+const expected = items.reduce((sum, item) => sum + item.price, 0);
+expect(calculateTotal(items)).toBe(expected);
+
+// Independent: a known result for a concrete case.
+expect(calculateTotal([{ price: 10 }, { price: 5 }])).toBe(15);
 ```
 
-Red flags:
+A literal is useful only when its correctness can be explained. Verify that a plausible wrong implementation would disagree with the assertion.
 
-- Mocking internal collaborators
-- Testing private methods
-- Asserting on call counts/order
-- Test breaks when refactoring without behavior change
-- Test name describes HOW not WHAT
-- Verifying through external means instead of interface
+## Meaningful observation
 
-```typescript
-// BAD: Bypasses interface to verify
-test("createUser saves to database", async () => {
-  await createUser({ name: "Alice" });
-  const row = await db.query("SELECT * FROM users WHERE name = ?", ["Alice"]);
-  expect(row).toBeDefined();
-});
+Prefer behavior visible through the interface that owns the contract. Internal modules can have stable contracts worth testing independently; private structure is not a contract merely because a test can reach it.
 
-// GOOD: Verifies through interface
-test("createUser makes user retrievable", async () => {
-  const user = await createUser({ name: "Alice" });
-  const retrieved = await getUser(user.id);
-  expect(retrieved.name).toBe("Alice");
-});
-```
+Choose the observation that proves the agreed result:
 
-**Tautological tests**: Expected value restates the implementation, so the test passes by construction.
+- Retrieval through the application interface can prove that a created user is available to callers.
+- Database inspection can prove a storage invariant or persistence requirement when that is the actual contract.
+- Call count or ordering can prove a required effect, such as charging once or committing before acknowledging; incidental helper calls do not warrant those assertions.
 
-```typescript
-// BAD: Expected value is recomputed the way the code computes it
-test("calculateTotal sums line items", () => {
-  const items = [{ price: 10 }, { price: 5 }];
-  const expected = items.reduce((sum, i) => sum + i.price, 0);
-  expect(calculateTotal(items)).toBe(expected);
-});
+Name tests by scenario and expected outcome. Several assertions can describe one coherent result. Keep setup and observation focused enough that a failure identifies the violated behavior.
 
-// GOOD: Expected value is an independent, known literal
-test("calculateTotal sums line items", () => {
-  expect(calculateTotal([{ price: 10 }, { price: 5 }])).toBe(15);
-});
-```
+## Scope and sensitivity
+
+Each case must add distinct protection within the approved plan. Equivalent examples, snapshots of incidental structure, and tests of simple forwarding can create maintenance without useful detection. Keep edge cases that expose a relevant risk rather than enumerating every imaginable input.
+
+A refactor that preserves the tested contract should usually preserve its tests. When tests change, distinguish a changed contract from accidental coupling or a removed test surface; retain the behavior they were protecting.

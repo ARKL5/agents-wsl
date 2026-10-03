@@ -1,38 +1,39 @@
 ---
 name: tdd
-description: Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions "red-green-refactor", or wants integration tests.
+description: Agree on high-value tests, then implement the selected behavior test-first.
+disable-model-invocation: true
 ---
 
 # Test-Driven Development
 
-TDD is the red → green loop. This skill is the reference that makes that loop produce tests worth keeping: what a good test is, where tests go, the anti-patterns, and the rules of the loop. Every section applies on every cycle: consult them before and during the loop, not after.
+Use TDD for an **agreed set of behaviors**, not as a mandate for comprehensive coverage. The user chooses the testing investment; the agent proposes worthwhile cases and is responsible for their implementation and verification.
 
-When exploring the codebase, read `CONTEXT.md` (if it exists) so test names and interface vocabulary match the project's domain language, and respect ADRs in the area you're touching.
+## 1. Agree on scope
 
-## What a good test is
+Read the requested behavior, relevant code, and existing tests. Use domain terms and relevant ADRs when present. Judge testing value against the project's purpose, lifetime, and cost of failure.
 
-Tests verify behavior through public interfaces, not implementation details. Code can change entirely; tests shouldn't. A good test reads like a specification: "user can checkout with valid cart" tells you exactly what capability exists, and it survives refactors because it doesn't care about internal structure.
+Propose a focused test plan in the conversation. For each case, state:
 
-See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines.
+- The scenario and expected behavior, with the requirement, contract, or known example that establishes it.
+- The meaningful error it would catch and why that protection is worth maintaining.
+- The interface or observation used to verify it, and any dependency substitution or fidelity gap.
 
-## Seams: where tests go
+Prioritize critical flows, error-prone logic, state transitions, and relevant regressions. Reuse existing coverage. State what is intentionally left untested and why; coverage percentage, function count, and possible edge cases alone do not justify more tests.
 
-A **seam** is the public boundary you test at: the interface where you observe behavior without reaching inside. Tests live at seams, never against internals.
+Resolve facts from the repository yourself. Ask the user to settle unclear behavior and approve the proposed scope before writing tests or implementation. An explicit test plan already approved for this task can satisfy this step. Complete when the cases, expected outcomes, and exclusions are agreed.
 
-**Test only at pre-agreed seams.** Before writing any test, write down the seams under test and confirm them with the user. No test is written at an unconfirmed seam. You can't test everything, so agreeing the seams up front is how testing effort lands on the critical paths and complex logic instead of every edge case.
+## 2. Work the loop
 
-Ask: "What's the public interface, and which seams should we test?"
+Develop one selected behavior at a time rather than writing the whole test suite up front. Apply [tests.md](tests.md) when designing assertions and [mocking.md](mocking.md) when choosing substitutes. When interface design is itself in question, consult `codebase-design`.
 
-When the shape of that interface is itself in question (how deep the module is, where the seam belongs, what the interface should expose), call the Skill tool with "codebase-design" for the vocabulary. It is the shared source of the module, interface, depth, seam, adapter, leverage and locality terms, and it is a reference to consult, not a session to run.
+1. **Red.** Write the next test and run it. Confirm it fails because the selected behavior is missing or wrong; setup, import, and syntax failures are not evidence of a regression. If it already passes, establish whether the behavior is already implemented or the test is insensitive, rather than making unrelated code fail.
+2. **Green.** Implement the behavior needed for that case and run the relevant tests. A behavior may need several assertions or examples; each should protect a distinct part of the agreed expectation.
+3. **Refactor.** Under passing tests, simplify the current implementation without changing its contract. Rerun the affected checks. Separate broader architectural changes from this cycle.
 
-## Anti-patterns
+Stay within the agreed test scope. If new evidence warrants another behavior or materially changes the verification strategy, explain the value and revise the plan with the user before expanding it. Test mechanics within the approved plan are the agent's responsibility.
 
-- **Implementation-coupled**: mocks internal collaborators, tests private methods, or verifies through a side channel (querying the database instead of using the interface). The tell: the test breaks when you refactor but behavior hasn't changed.
-- **Tautological**: the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a snapshot derived by hand the same way, a constant asserted equal to itself), so it passes by construction and can never disagree with the code. Expected values must come from an independent source of truth: a known-good literal, a worked example, the spec.
-- **Horizontal slicing**: writing all tests first, then all implementation. Bulk tests verify _imagined_ behavior: you test the _shape_ of things rather than user-facing behavior, the tests go insensitive to real changes, and you commit to test structure before understanding the implementation. Work in **vertical slices** instead: one test → one implementation → repeat, each test a **tracer bullet** that responds to what the last cycle taught you.
+## 3. Verify and report
 
-## Rules of the loop
+Check each agreed case against the resulting tests, remove redundant coverage introduced by this work, and run the affected checks and relevant existing regression tests. Report results, deliberate exclusions, and any unresolved failures or verification limits.
 
-- **Red before green.** Write the failing test first, then only enough code to pass it. Don't anticipate future tests or add speculative features.
-- **One slice at a time.** One seam, one test, one minimal implementation per cycle.
-- **Refactoring is not part of the loop.** It belongs to the review stage (see the `code-review` skill), not the red → green implementation cycle.
+Complete when every agreed case is covered by meaningful assertions and passing checks, with evidence of red before implementation where behavior was missing or defective. Already-satisfied cases and blocked checks are reported explicitly. Further coverage is a separate choice, not unfinished work by default.
