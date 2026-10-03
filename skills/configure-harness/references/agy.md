@@ -19,11 +19,11 @@
 | 插件 | 不安装、不配置市场，也不从其他 harness 导入 |
 | MCP | 默认不安装 |
 | Skills | 使用 `~/.agents/skills` 的绝对路径，不复制到 harness 专属目录；内置 skill 按需加载，保留 |
-| 跨 harness 集成 | 使用 herdr，集成标识为 `agy` |
+| 跨 harness 集成 | 使用 herdr，集成标识为 `antigravity-cli` |
 
 ## 维护边界
 
-`~/.gemini/config/hooks.json` 的 herdr 条目由 `herdr integration install agy` 维护。
+`~/.gemini/config/hooks.json` 的 herdr 条目由 `herdr integration install antigravity-cli` 维护。
 
 配置维护保留既有状态栏、终端模式、信任清单及远程控制主机名；只在本次任务涉及它们时调整。
 
