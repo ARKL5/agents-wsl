@@ -1,51 +1,34 @@
 # Claude Code
 
-运行时权威：`~/.claude/settings.json`。版本、型号、effort、字段名：一律现查，不写回本文件。
+## 配置位置
 
-## 类型
+- `~/.claude/settings.json`：用户级权限、功能、环境、hooks 和界面设置。
+- `~/.claude/agents/`：自定义 agent 定义。
+- `~/.claude/skills/`：skill 链接及账号同步内容。
 
-不是落点。已有 `~/.claude/agents/` 下的自定义类型先不动，除非用户这轮点名删除。
+## 个人约定
 
-现查：`claude --help`、官方 sub-agents 文档（`find-docs` 或 `code.claude.com/docs/en/<页>.md`）
-
-## 表面
-
-- `~/.claude/settings.json`（权限、连接器、内置 skill、账号 skill 同步、反馈工具、Artifact、workflows、`env`、hooks）
-- 现查：官方 settings-reference、env-vars、permission-modes 各页
-- `statusLine`、`theme` 是活偏好，原样留下
-- `hooks` 里的 herdr 条目由 `herdr integration install claude` 维护，不手改
-
-## 家私
-
-bypass 默认模式只在用户级 settings 生效，写在 `~/.claude/settings.json`。`~/.claude/skills/<name>` 链接由 `sync-agent-skills` 的同步维护；`~/.claude/skills/synced/` 是账号同步目录，关同步后其内容移入 `.trash`。
-
-本家权限 deny 只写工具名时，官方明确会把该工具从上下文里整个拿掉，算关上；带范围的 deny 只挡调用，不算。没有专门开关的内置工具走前者。关完用 `claude -p --output-format stream-json --verbose` 的 init 消息核对工具表。
-
-## 故意约定
-
-| 约定 | 说明 |
+| 项目 | 约定 |
 | --- | --- |
-| 权限 | 全开，bypass，跳过进入确认框 |
-| 委派 | 总闸开；内置 `Explore` / `Plan` 留下 |
-| claude.ai 连接器 | 关 |
-| 反馈工具 | 关，从工具表移除 |
-| 内置 skill | 关 |
-| claude.ai 账号 skill 同步 | 关 |
-| Artifact | 关 |
-| 自动记忆 | 留下 |
-| 遥测 | 关；错误上报等其余后台流量留下 |
-| Dynamic workflows | 关 |
-| 定时与循环任务 | 关，连同自调度唤醒工具 |
-| 云端 routine 触发、设计稿同步、审查报告、notebook 编辑 | 关 |
-| worktree 工具与计划模式工具 | 关；后台会话隔离随之改为直接改工作副本 |
-| herdr | 集成装上 |
-| 其余面 | 留下。按占法列过、未再点名关的不再关 |
+| 权限 | 使用 bypass 模式，跳过进入确认框 |
+| 委派 | 保持启用，保留内置 `Explore` 和 `Plan` |
+| 关闭的集成 | claude.ai 连接器和账号 skill 同步 |
+| 关闭的工具与能力 | 反馈工具、内置 skills、Artifact、Dynamic workflows；定时和循环任务及自调度唤醒工具；云端 routine 触发、设计稿同步、审查报告、notebook 编辑；worktree 和计划模式工具 |
+| 后台会话 | 直接修改工作副本，与关闭 worktree 工具的决定一致 |
+| 自动记忆 | 保留 |
+| 后台流量 | 关闭遥测；错误上报等其余后台流量保留 |
+| 跨 harness 集成 | 安装 herdr 集成 |
 
-## 现查（动手前）
+## 维护边界
 
-```bash
-claude --version
-jq . ~/.claude/settings.json
-ls ~/.claude/agents ~/.claude/skills
-herdr integration status
-```
+- bypass 默认模式配置在用户级 settings 中；修改时核查当前生效范围。
+- herdr hooks 由 `herdr integration install claude` 维护。
+- `~/.claude/skills/<name>` 链接由 `sync-agent-skills` 的同步流程维护。
+- `~/.claude/skills/synced/` 是账号同步目录；关闭同步时，其内容移入 `.trash`。
+- 状态栏和主题保留实际配置中的个人偏好，只在任务涉及它们时调整。
+
+## 验证方式
+
+按任务查当前官方 settings、环境变量、权限模式或 sub-agents 文档。配置字段通过 `find-docs` 核查，集成通过 herdr 的当前诊断入口验证。
+
+精简工具时区分“从上下文移除”和“仅禁止调用”。此前不带范围的工具名 deny 可移除工具描述，而带范围的 deny 仅阻止调用；修改前核查当前契约，修改后验证会话初始工具表。

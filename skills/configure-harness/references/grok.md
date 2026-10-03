@@ -1,42 +1,26 @@
 # Grok
 
-运行时权威：`~/.grok/config.toml`。版本、型号、effort、字段名：一律现查，不写回本文件。
+## 配置位置
 
-## 类型
+- `~/.grok/config.toml`：权限、功能、模型、兼容性扫描和 skills 设置。
+- `~/.grok/agents/`：自定义 agent 定义。
+- `~/.grok/docs/user-guide/`：当前安装附带的文档。
 
-不是落点。已有 `~/.grok/agents/` 下的自定义类型先不动，除非用户这轮点名删除。
+## 个人约定
 
-现查：`~/.grok/docs/user-guide/16-subagents.md`、`05-configuration.md`、`grok inspect`；官方字段走 `find-docs`
-
-## 表面
-
-- `~/.grok/config.toml`（权限、sandbox、features、memory、compat、skills、委派类型开关）
-- 现查：同目录 user-guide 里 permissions / features / harness compatibility 各节
-- `[models]` 与各 `[model."…"]` 是活偏好，除非用户这轮要改型号，否则原样留下
-
-## 家私
-
-spawn 参数名、权限字段名现查，不要沿用记忆。
-
-## 故意约定
-
-| 约定 | 说明 |
+| 项目 | 约定 |
 | --- | --- |
-| 权限 | 全开；sandbox 关 |
-| 委派 | 总闸开。子 agent 仅保留 `general-purpose`；点名关闭 `explore` 与 `plan` |
-| 生图 / 生视频 | 关。改图没有能从工具表拿掉的用户开关，仍占着 |
-| LSP | 关 |
-| 代码索引 | 关 |
-| 插件 | 本家不装、不挂市场 |
-| 跨家扫描 | Cursor / Claude / Codex 的 skills、rules、agents、mcp、hooks、sessions 关 |
-| skill | 只认 `~/.agents/skills`，不往 `~/.grok/skills` 装 |
-| 其余面 | 留下。按占法列过、未再点名关的不再关 |
+| 权限 | 全部开放，关闭沙箱 |
+| 委派 | 保持启用；内置子 agent 只启用 `general-purpose`，关闭 `explore` 和 `plan` |
+| 功能精简 | 关闭生图、生视频、LSP 和代码索引 |
+| 插件 | 不安装，也不配置市场 |
+| 兼容性扫描 | 关闭对 Cursor、Claude、Codex 的 skills、rules、agents、MCP、hooks 和 sessions 扫描 |
+| Skills | 只使用 `~/.agents/skills`，不往 `~/.grok/skills` 安装 |
 
-## 现查（动手前）
+## 维护边界
 
-```bash
-grok --version
-grok inspect
-python3 -c 'import tomllib; print(tomllib.load(open("/home/ark/.grok/config.toml","rb")))'
-ls ~/.grok/agents
-```
+改图此前因缺少移除工具描述的配置机制而保留；没有新依据时不自动关闭。
+
+## 验证方式
+
+配置修改参照本机 user-guide 的配置、权限、功能及兼容性章节；委派修改查 subagents 章节。`grok inspect` 用于核对生效配置，具体参数以当前帮助为准。

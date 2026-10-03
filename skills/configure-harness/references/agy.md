@@ -1,51 +1,34 @@
 # Agy
 
-运行时权威：`~/.gemini/antigravity-cli/settings.json`。全局自定义在 `~/.gemini/config/`。版本、型号、effort、字段名：一律现查，不写回本文件。命令是 `agy`。
+## 配置位置
 
-## 类型
+- `~/.gemini/antigravity-cli/settings.json`：权限、运行方式、工作区信任和界面设置。
+- `~/.gemini/config/`：MCP、hooks、插件、skill 路径和自定义 agent 定义。
+- `~/.gemini/antigravity-cli/statusline`：个人 Python 状态栏脚本。
+- `~/.gemini/antigravity-cli/builtin/skills/`：当前安装附带的说明。
 
-不是落点。已有 `~/.gemini/config/` 下的自定义类型先不动，除非用户这轮点名删除。
+## 个人约定
 
-现查：`agy --help`、`agy agent`；官方字段走 `find-docs`。本机内置说明在 `~/.gemini/antigravity-cli/builtin/skills/`。
-
-## 表面
-
-- `~/.gemini/antigravity-cli/settings.json`（权限、sandbox、工作区外读写、遥测）
-- `~/.gemini/config/`（MCP、hooks、plugins、skills.json）
-- 现查：官方 CLI permissions / features / reference；`agy mcp list`、`agy plugin list`
-- 型号与账号不是这轮默认要动的面
-
-## 家私
-
-json 字段名、权限模式取值、hooks 事件名现查。不要改账号、远程控制主机名、与表面无关的段。`skills.json` 的 `path` 用绝对路径。
-
-## 故意约定
-
-| 约定 | 说明 |
+| 项目 | 约定 |
 | --- | --- |
-| 权限 | 全开；sandbox 关；工作区外读写开 |
-| 委派 | 总闸开。内置类型无逐项开关 |
-| 生图 | 无用户开关能从工具表拿掉，仍占着 |
-| 生视频 | 无此面 |
-| LSP | 无此面（语言服务器是产品自身，不是用户工具开关） |
-| 代码索引 | 无此面（本地搜索，不是常驻索引） |
-| 插件 | 本家不装、不挂市场、不从别家导入 |
-| MCP | 默认不装 |
-| 内置 skill | 调用才进，留下 |
-| skill | 全局 `skills.json` 指向 `~/.agents/skills`，不往 `~/.gemini/config/skills/` 复制 |
-| 跨家 | herdr 官方 integration；检测名是 `agy` |
-| 其余面 | 留下。按占法列过、未再点名关的不再关 |
+| 权限 | 无逐次确认，关闭沙箱，允许工作区外读写 |
+| 状态栏 | 命令调用 Python 脚本；单行自适应宽度，避免折行和异常退出导致停用 |
+| 终端 | 始终使用备用屏幕模式 |
+| 工作区信任 | 保留已信任路径 |
+| 委派 | 保持启用 |
+| 插件 | 不安装、不配置市场，也不从其他 harness 导入 |
+| MCP | 默认不安装 |
+| Skills | 使用 `~/.agents/skills` 的绝对路径，不复制到 harness 专属目录；内置 skill 按需加载，保留 |
+| 跨 harness 集成 | 使用 herdr，集成标识为 `agy` |
 
-## 现查（动手前）
+## 维护边界
 
-```bash
-agy --version
-agy --help
-agy agent
-agy mcp list
-agy plugin list
-python3 -c 'import json; print(json.load(open("/home/ark/.gemini/antigravity-cli/settings.json")))'
-ls ~/.gemini/config
-herdr integration status
-herdr agent start --help
-```
+`~/.gemini/config/hooks.json` 的 herdr 条目由 `herdr integration install agy` 维护。
+
+配置维护保留既有状态栏、终端模式、信任清单及远程控制主机名；只在本次任务涉及它们时调整。
+
+## 验证方式
+
+按任务查 `agy --help`、当前安装附带的说明，必要时通过 `find-docs` 查官方契约。MCP、插件和 herdr 集成各用对应的当前命令验证。
+
+功能是否存在、内置 agent 能否分别关闭，以及功能如何进入上下文，均按当前版本核查。此前生图因缺少移除工具描述的配置机制而保留；没有新依据时不自动关闭。

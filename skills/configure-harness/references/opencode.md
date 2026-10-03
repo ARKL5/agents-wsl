@@ -1,38 +1,23 @@
 # OpenCode
 
-## 类型
+## 配置位置
 
-不是落点。已有 `opencode.json` 里的自定义 `agent.*` 先不动，除非用户这轮点名删除。
+- `~/.config/opencode/opencode.json`：权限、provider、模型和 agent 设置；自定义 agent 定义也可能在此文件中。
+- `~/.config/opencode/plugins/`：用户插件。
 
-现查：`opencode --help`、该 json 的 `$schema`；官方字段走 `find-docs`
+## 个人约定
 
-## 表面
-
-- 同一 `opencode.json`：`permissions`、内置 `agent.*.disable`
-- 现查：官方 agents / permissions 文档，版本以这次安装为准
-- 模型目录不是这轮默认要动的面
-
-## 家私
-
-不要改 `provider`、模型目录、以及与表面无关的键。
-
-## 故意约定
-
-| 约定 | 说明 |
+| 项目 | 约定 |
 | --- | --- |
-| 权限 | 全开 |
-| 委派 | 总闸开。子 agent 仅保留 `general`（使用 `cliproxy/grok-4.7-build-fast:medium`）；点名关闭 `explore`；`plan` 留下 |
-| 插件 | 本家不装用户插件；MCP 默认不装 |
-| 其余面 | 留下。按占法列过、未再点名关的不再关 |
+| 权限 | 全部开放 |
+| 委派 | 保持启用；内置子 agent 启用 `general`、关闭 `explore`；主 agent `plan` 保留 |
+| 插件 | 不安装用户插件 |
+| MCP | 默认不安装 |
 
-## 现查（动手前）
+## 维护边界
 
-```bash
-opencode2 --version
-opencode2 debug agents
-opencode2 mcp list
-opencode2 plugin list
-python3 -c 'import json; print(json.load(open("/home/ark/.config/opencode/opencode.json")))'
-ls ~/.config/opencode/plugins
-herdr integration status
-```
+配置文件同时包含多种设置，按本次任务修改相关键。模型路由及 agent 的模型选择、思考强度以实际配置为准。
+
+## 验证方式
+
+配置字段查文件声明的 schema 及当前官方 agents / permissions 文档。CLI 使用本机 `opencode2` 入口，命令以当前帮助为准；按任务核对 agent、MCP、插件或 herdr 集成。

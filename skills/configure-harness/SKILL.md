@@ -1,34 +1,34 @@
 ---
 name: configure-harness
-description: 按本机理念对照并改写点名那一家 harness。仅用户点名。
+description: 维护本机 harness 的个人配置、扩展和集成。
 disable-model-invocation: true
 ---
 
-# 配置 harness
+# 维护 harness 配置
 
-点名一家。未点名先问。一次只改点名的家。以后加家：下表加一行，并新增 `references/<name>.md`。
+处理用户指定 harness 的配置调整、故障修复、扩展和包维护，以及个人约定的记录。维护范围是 WSL 用户目录；一次处理一个 harness，目标可从当前对话确定，无法确定时再问。
 
-先读 [`PHILOSOPHY.md`](PHILOSOPHY.md)，再读该家文件。默认只做表面。
-
-| 家 | 读 |
+| Harness | 参考文件 |
 | --- | --- |
-| **grok** | [references/grok.md](references/grok.md) |
-| **pi** | [references/pi.md](references/pi.md) |
-| **opencode** | [references/opencode.md](references/opencode.md) |
-| **codex** | [references/codex.md](references/codex.md) |
-| **agy** | [references/agy.md](references/agy.md) |
-| **claude-code** | [references/claude-code.md](references/claude-code.md) |
+| grok | [references/grok.md](references/grok.md) |
+| pi | [references/pi.md](references/pi.md) |
+| opencode | [references/opencode.md](references/opencode.md) |
+| codex | [references/codex.md](references/codex.md) |
+| agy | [references/agy.md](references/agy.md) |
+| claude-code | [references/claude-code.md](references/claude-code.md) |
 
-cliproxy 接入与更新走 `cli-proxy-api`。本 skill 只写 WSL 家目录，不写 Windows。型号与 effort 以 live 为准，除非这轮用户要改；不写回 skill。
+## 工作流程
 
-官方字段名、开关、工具面：走 `find-docs`（Context7）加该家活文件，不把查到的名字写回 `references/`。
+1. **确定任务。** 读取目标 harness 的参考文件，确定要调整的行为和相关文件。局部维护只检查相关配置；用户要求全面整理时才扩大范围。
+2. **核查依据。** 完整读取待修改的配置或脚本。涉及权限、功能启停或上下文精简时，读 [PHILOSOPHY.md](PHILOSOPHY.md)；官方配置字段和 API 查 `find-docs` 或当前安装附带的文档、帮助、schema。
+3. **修改并验证。** 使用该 harness 实际加载的配置入口。配置改动验证解析及生效，扩展改动验证加载及相关行为，包维护核对更新结果；需要重载或重启时说明。
+4. **记录并回报。** 新的个人偏好、维护约束，或不从实际配置本身可直接判断的稳定维护入口写回对应参考文件。报告修改路径、行为变化和验证结果；未验证的部分明确列出。
 
-## Steps
+## 维护边界
 
-1. **读理念。** 通读 [`PHILOSOPHY.md`](PHILOSOPHY.md)。
-2. **读这家。** 打开上表文件。Pi 的更新/修复只在点名那些分支时再读该文件后半与 [`assets/`](assets/)。完成：知道活路径和这轮要动的面。
-3. **现查。** 按该家文档入口查官方契约（`find-docs` / 本机 user-guide / `--help` / schema），并读活文件全文。完成：每个将写的字段都有当前官方或 schema 依据。
-4. **写入。** 落点是表面。禁止使用全局 `AGENTS.md`。不创建、不改写自定义类型文件；已有的先不动，除非用户这轮点名删除。表面按 [`PHILOSOPHY.md`](PHILOSOPHY.md) 逐条对照。用户要自己选关哪些时，先按占法列出这次查到的选项再改。不要动密钥、cliproxy、与这轮无关的模型目录。完成：理念每一条在这家活配置里有对照（留下、关上、或无此面）；自定义类型均未改（除非用户点名删除）。不能只写「已同步」。
-5. **回报。** 家、改了哪些路径、现查验证。密钥只报有/无。
+- 实际配置文件是当前状态的依据，参考文件记录个人约定；用户本次要求优先。只修改与任务相关的内容，模型、思考强度、账号和自定义 agent 定义不作为例行重置项。
+- 配置写入 harness 支持的配置文件或扩展；不用全局 `AGENTS.md` 代替配置。跨 harness 会话使用 herdr，其管理的集成通过官方维护入口调整。
+- 参考文件保留个人决定和必要的维护知识；版本、模型清单、官方能力支持情况和可直接读取的实现细节按需核查，不写入参考文件。具体模型及思考强度保留在实际配置中。
+- 凭据仅报告有无，不输出内容。
 
-Finish when step 4 的对照写完且只动了点名的家。
+完成标准：任务范围内的修改和必要验证已完成，新的个人约定已记录，无关配置保持原样。
