@@ -1,6 +1,6 @@
 # agents-wsl: Multi-Harness Agent Skills & Context Governance
 
-[![Skills Verification](https://img.shields.io/badge/skills-24%20verified-brightgreen)](tools/check.py)
+[![Skills Verification](https://img.shields.io/badge/skills-25%20verified-brightgreen)](tools/check.py)
 [![Architecture](https://img.shields.io/badge/architecture-multi--harness-blue)](skills/configure-harness/)
 [![Philosophy](https://img.shields.io/badge/context-governance-purple)](skills/configure-harness/PHILOSOPHY.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -47,12 +47,13 @@ $$\text{In-file Steps (执行步骤)} \longrightarrow \text{In-file Reference (�
 
 ## 🗂️ 核心技能矩阵 (Skills Matrix)
 
-仓库内现行沉淀 **24 项工程技能**（其中 14 项列入跨工作区共享名单 [`shared-skills.txt`](shared-skills.txt)），全部经过 [`tools/check.py`](tools/check.py) 的严格类型与契约校验：
+仓库内现行沉淀 **25 项工程技能**（其中 14 项列入跨工作区共享名单 [`shared-skills.txt`](shared-skills.txt)），全部经过 [`tools/check.py`](tools/check.py) 的严格类型与契约校验：
 
 ### 🏗️ 架构设计与领域建模 (Architecture & Domain)
 - [`domain-modeling`](skills/domain-modeling/)：将模糊概念晶体化为领域词汇表（`CONTEXT.md`）与架构决策记录（`ADR`），杜绝隐式术语漂移；
 - [`codebase-design`](skills/codebase-design/)：遵循 John Ousterhout 深度模块理念，设计深接口、强内聚接缝与可维护代码边界；
 - [`improve-codebase-architecture`](skills/improve-codebase-architecture/)：代码坏味道识别、重构手法建议与设计演进；
+- [`to-spec`](skills/to-spec/)：为中小型任务确定共同认可的行为、完成条件和必要边界。
 - [`to-tickets`](skills/to-tickets/)：将计划、规格或对话拆解为带验收条件和阻塞关系的工程工单。
 
 ### 🛡️ 质量保障与防御性研发 (Quality & Resilience)
