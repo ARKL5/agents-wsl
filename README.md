@@ -47,7 +47,7 @@ $$\text{In-file Steps (执行步骤)} \longrightarrow \text{In-file Reference (�
 
 ## 🗂️ 核心技能矩阵 (Skills Matrix)
 
-仓库内现行沉淀 **25 项工程技能**（其中 14 项列入跨工作区共享名单 [`shared-skills.txt`](shared-skills.txt)），全部经过 [`tools/check.py`](tools/check.py) 的严格类型与契约校验：
+仓库内现行沉淀 **25 项工程技能**（其中 15 项列入跨工作区共享名单 [`shared-skills.txt`](shared-skills.txt)），全部经过 [`tools/check.py`](tools/check.py) 的严格类型与契约校验：
 
 ### 🏗️ 架构设计与领域建模 (Architecture & Domain)
 - [`domain-modeling`](skills/domain-modeling/)：将模糊概念晶体化为领域词汇表（`CONTEXT.md`）与架构决策记录（`ADR`），杜绝隐式术语漂移；
