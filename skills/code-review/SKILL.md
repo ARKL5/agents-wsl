@@ -1,62 +1,51 @@
 ---
 name: code-review
-description: "Review committed changes since a supplied fixed point along two axes: Standards (this repo's documented coding standards) and Spec (the path the caller passed). Use when reviewing since a commit, branch, or tag."
+description: "Independently review committed changes since a supplied revision against project standards and requirements from a file or the agreed conversation."
 ---
 
-Two-axis review of the diff between `HEAD` and a fixed point the caller supplies:
+# Code Review
 
-- **Standards**: does the code conform to this repo's documented coding standards?
-- **Spec**: does the code faithfully implement the path the caller passed?
+Review through two independent perspectives:
 
-Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
+- **Standards**: does the change violate the project's documented engineering standards?
+- **Spec**: does it implement the agreed behavior correctly, without omissions, regressions, or unrequested scope?
 
-## Process
+Keep the perspectives distinct during investigation; combine their evidence into a useful report afterward. This skill reviews and reports. The implementing caller owns code changes and commits.
 
-### 1. Pin the fixed point
+## 1. Pin the range
 
-Whatever the caller said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.). If they didn't specify one, ask for it.
+Use the fixed point supplied by the caller; ask if none was supplied. Resolve it and `HEAD` to commit IDs so all reviewers inspect the same snapshot. Use `git diff <base>...<target>` and `git log <base>..<target> --oneline`. State that the diff starts at the merge base; if that differs from the supplied base, clarify the intended range before proceeding.
 
-The review is `git diff <fixed-point>...HEAD` (three-dot, merge-base). Uncommitted work is outside this review: commit first if it should be in. Also note `git log <fixed-point>..HEAD --oneline`.
+Confirm the range is valid and non-empty before delegation. Uncommitted changes are outside this review; report that exclusion without committing them. An invalid range or no changes to inspect is not a successful review.
 
-Before going further, confirm the fixed point resolves (`git rev-parse <fixed-point>`) and the diff is non-empty. A bad ref or empty diff should fail here, not inside two parallel sub-agents.
+## 2. Establish the sources
 
-### 2. Identify the spec source
+For **Spec**, read the supplied file and relevant linked decisions, or use the caller's account of requirements and confirmed decisions from the current conversation. Separate requirements, acceptance criteria, and explicit exclusions from proposals and background explanation. A heading or checklist format does not establish approval. Ask about ambiguity only when it changes the review's conclusion.
 
-The Spec axis is the path the caller passed. If they did not pass one, skip this axis.
+For **Standards**, follow the repository's agent index to its engineering standards and relevant local rules. Existing ADRs can explain deliberate choices.
 
-### 3. Identify the standards source
+State which sources each perspective uses. If a source is unavailable, mark that perspective as skipped and explain the limit. If neither perspective has an adequate source, report the blocker rather than launching an empty review or inventing a spec or standards document.
 
-The Standards axis is the standards document the repo index points at. If the index has no such pointer, skip this axis.
+## 3. Dispatch independent reviewers
 
-### 4. Spawn both sub-agents in parallel
+Launch one fresh-context, read-only sub-agent per applicable perspective, in parallel when both apply. Give each the pinned range, repository location, source material, and its review brief. Each reviewer investigates directly without invoking this skill or delegating further.
 
-Each sub-agent performs the review directly. It does not invoke `code-review` or spawn further agents.
+**Standards brief**: check applicable documented rules and cite the violated rule for each finding. Distinguish deliberate, justified departures from violations. Personal style preferences, speculative refactors, and coverage targets absent from the project's standards are not defects. Avoid duplicating mechanical diagnostics already supplied by tooling.
 
-**Standards sub-agent prompt** should include:
+**Spec brief**: account for every agreed requirement, identify missing or partial behavior, and inspect implemented behavior for errors and regressions. Check exclusions and report behavior outside the requested scope. Cite the requirement or existing contract that establishes the expected behavior.
 
-- The full diff command and commit list.
-- The contents of the document from step 3.
-- The brief: "Report, per file/hunk where relevant, every place the diff violates a documented standard: cite the standard (file + the rule). Skip anything tooling enforces. Perform this review directly in this sub-agent; do not invoke code-review or spawn additional agents. Under 400 words."
+Both reviewers read the surrounding implementation, callers, tests, and contracts needed to check consequences; the diff is the entry point, not the whole evidence. Focus on problems introduced or exposed by the change. Distinguish pre-existing issues. Test gaps warrant findings when they leave a concrete relevant risk unverified, not merely because more tests are possible.
 
-**Spec sub-agent prompt** should include:
+Each finding includes its perspective, severity, file and line, triggering conditions, impact, and supporting evidence. Reviewers distinguish established defects from unresolved questions and state what they inspected and any verification limits. They do not edit code or commit. A launch or reviewer failure is an incomplete review; report the blocker.
 
-- The diff command and commit list.
-- The path and contents of the file from step 2.
-- The brief: "Requirements are What to build and the untitled checklist after it when those exist; otherwise the whole document. Report: (a) requirements missing or partial; (b) behaviour in the diff that wasn't asked for; (c) requirements that look implemented but where the implementation looks wrong. Quote the source line for each finding. Perform this review directly in this sub-agent; do not invoke code-review or spawn additional agents. Under 400 words."
+## 4. Check and report
 
-If no spec path was supplied, skip the Spec sub-agent and note this in the final report. If no standards document was found, skip the Standards sub-agent and note this in the final report.
+Verify findings against the code and source material. Resolve duplicates and disagreements with evidence; preserve unresolved uncertainty as a question rather than turning it into a confirmed defect. Keep the originating perspective or perspectives on merged findings.
 
-### 5. Aggregate
+Present substantiated findings in severity order, followed by open questions, assumptions, and review limits. If there are no findings, say so within the inspected scope. Report which perspectives ran and any skipped work or checks not performed; missing review is not a pass.
 
-Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings, because the two axes are deliberately separate (see _Why two axes_).
+Complete when each applicable review has returned, its findings have been checked, and the report identifies actionable issues and remaining uncertainty. Completion of a review does not mean the code is defect-free or that its findings have been fixed.
 
-End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes: that's the reranking the separation exists to prevent.
+## Reviewing corrections
 
-## Why two axes
-
-A change can pass one axis and fail the other:
-
-- Code that follows every standard but implements the wrong thing → **Standards pass, Spec fail.**
-- Code that does exactly what the path asked but breaks the project's conventions → **Spec pass, Standards fail.**
-
-Reporting them separately stops one axis from masking the other.
+When the caller supplies committed fixes, pin the new target and independently recheck the affected findings and relevant regression risks. Retain the original requirements and baseline; use the previous review target to identify the corrections. Report whether each previous finding is resolved, still present, or inconclusive, plus any new substantiated issues. The same investigation and reporting rules apply; rechecking does not transfer code changes to the reviewers.
