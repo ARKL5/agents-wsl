@@ -1,59 +1,39 @@
 ---
 name: to-tickets
-description: "Break a plan, spec, or the current conversation into tracer-bullet tickets, each declaring its blocking edges."
+description: "Organize an agreed large body of work into verifiable tickets with explicit dependencies."
 disable-model-invocation: true
 ---
 
 # To Tickets
 
-Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
+Organize an agreed large body of work into **tickets** that another agent can pick up: each has a bounded deliverable, acceptance criteria, and explicit dependencies. The work comes from this conversation or a source path the user supplies; read the source and relevant linked decisions.
+
+Reference existing requirements and decisions instead of rewriting the spec. Tickets add execution boundaries, verification, dependencies, and the context needed to resume.
 
 **Where the tickets physically live.** Read [ticket-operations.md](ticket-operations.md).
 
-The source is this conversation, or a path the user passed. If they passed one, fetch it and follow its title links to the files that hold the bindings.
-
-If a slice would need a binding the source does not have, **stop** and list the missing bindings.
-
 ## Process
 
-### 1. Explore the codebase (optional)
+### 1. Establish the basis
 
-If you have not already explored the codebase, do so to understand the current state of the code. Ticket titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
+Inspect the relevant code and existing checks as needed to establish scope and dependencies. Use the project's domain vocabulary and respect relevant ADRs.
 
-Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
+Resolve discoverable facts yourself; leave implementation details that do not affect the breakdown to implementation. Ask the user about unresolved choices that change scope, behavior, or acceptance before treating them as settled.
 
-### 2. Draft vertical slices
+### 2. Draft work units
 
-Break the work into **tracer bullet** tickets.
+Use **tracer bullets** for feature work: each slice covers the layers needed for one verifiable behavior, rather than dividing the work by technical layer. Migrations, enabling capabilities, and architectural changes can be separate tickets when they have a concrete outcome and verification method.
 
-<vertical-slice-rules>
-
-- Each slice cuts a narrow but COMPLETE path through every layer (schema, API, UI, tests): vertical, NOT a horizontal slice of one layer
-- A completed slice is demoable or verifiable on its own
-- Each slice is sized to fit in a single context window
-- Any prefactoring should be done first
-
-</vertical-slice-rules>
-
-Give each ticket its **blocking edges**: the other tickets that must complete before it can start. A ticket with no blockers can start immediately.
+- Bound each ticket so one agent session can complete and verify it with the supplied context.
+- Declare **blocking edges** only when another ticket's result is required, not merely because it is convenient to do first.
+- Make prefactoring a prerequisite only when it is necessary for dependent work.
+- Account for every agreed requirement across the tickets, including integration and final verification where needed; remove gaps, duplicate scope, and work the source does not call for.
 
 **Wide refactors are the exception to vertical slicing.** A **wide refactor** is one mechanical change (rename a column, retype a shared symbol) whose **blast radius** fans across the whole codebase, so a single edit breaks thousands of call sites at once and no vertical slice can land green. Don't force it into a tracer bullet; sequence it as **expand–contract**. First expand: add the new form beside the old so nothing breaks. Then migrate the call sites over in batches sized by blast radius (per package, per directory), each batch its own ticket blocked by the expand, keeping CI green batch to batch because the old form still exists. Finally contract: delete the old form once no caller remains, in a ticket blocked by every migrate batch. When even the batches can't stay green alone, keep the sequence but let them share an integration branch that all block a final integrate-and-verify ticket; green is promised only there.
 
-### 3. Quiz the user
+### 3. Review the breakdown
 
-Present the proposed breakdown as a numbered list. For each ticket, show:
-
-- **Title**: short descriptive name
-- **Blocked by**: which other tickets (if any) must complete first
-- **What it delivers**: the end-to-end behaviour this ticket makes work
-
-Ask the user:
-
-- Does the granularity feel right? (too coarse / too fine)
-- Are the blocking edges correct: does each ticket only depend on tickets that genuinely gate it?
-- Should any tickets be merged or split further?
-
-Iterate until the user approves the breakdown.
+Present the proposed tickets as a numbered list, showing each deliverable and its blockers with the reason for each dependency. Ask the user to review scope, priorities, and granularity; revise until they approve the breakdown.
 
 ### 4. Publish the tickets
 
@@ -65,7 +45,7 @@ Leave the source unchanged.
 
 # <NN>: <Ticket title>
 
-**What to build:** the end-to-end behaviour this ticket makes work, from the user's perspective, not a layer-by-layer implementation list.
+**What to build:** the bounded behavior or outcome this ticket delivers, with enough context to distinguish its scope from adjacent tickets.
 
 **Blocked by:** the numbers/titles of the tickets that gate this one, or "None (can start immediately)".
 
@@ -74,4 +54,6 @@ Leave the source unchanged.
 
 </ticket-template>
 
-Avoid specific file paths or code snippets: they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it and note briefly that it came from a prototype. Trim to the decision-rich parts, not a working demo, just the important bits.
+Keep the ticket centered on its deliverable and acceptance. Reference source artifacts for established requirements and decisions; file paths can locate relevant code, and concise code can express an agreed contract when it is more precise than prose.
+
+Complete when the approved tickets are written, collectively cover the agreed work, have verifiable acceptance criteria and acyclic blocking edges that reference existing tickets, and provide enough context and references for another agent to proceed. Return their location.
