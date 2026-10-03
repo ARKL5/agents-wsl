@@ -23,10 +23,10 @@ Create targets lazily: create `CONTEXT.md` at repo root when the first term crys
    - **Fuzzy or conflicting language**: overloaded words, synonyms, or a mismatch between spoken terms and code identifiers. Align on a single canonical term (the symbol used in code) and identify aliases to avoid.
    - **Irreversible decisions**: an architectural or technology choice that meets the 3-condition bar in [ADR-FORMAT.md](ADR-FORMAT.md) (hard to reverse, surprising without context, real trade-off). If any condition is missing, skip the ADR.
 2. **Crystallise.** Write the entry down immediately:
-   - **For a term**: read the existing glossary and add or revise the entry following [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md). Define the business reality, not code structure, in 1-2 sentences. Always include `_Avoid_` aliases.
+   - **For a term**: read the existing glossary and add or revise the entry following [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md). Define the business reality, not code structure, in 1-2 sentences.
    - **For an ADR**: write `docs/adr/NNNN-slug.md` (increment highest number) following [ADR-FORMAT.md](ADR-FORMAT.md). State context, decision, and why in 1-3 sentences.
 3. **Verify.** Confirm the recorded term or decision is complete:
-   - Glossary entry passes the code-independence test, carries `_Avoid_` aliases, and has no duplicate or conflicting definition elsewhere in the glossary.
+   - Glossary entry passes the code-independence test and has no duplicate or conflicting definition elsewhere in the glossary.
    - ADR qualifies under the contrast test.
 
 Finish when the resolved term or ADR is written to disk and verified against its format.
