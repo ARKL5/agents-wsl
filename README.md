@@ -1,6 +1,6 @@
 # agents-wsl: Multi-Harness Agent Skills & Context Governance
 
-[![Skills Verification](https://img.shields.io/badge/skills-27%20verified-brightgreen)](tools/check.py)
+[![Skills Verification](https://img.shields.io/badge/skills-24%20verified-brightgreen)](tools/check.py)
 [![Architecture](https://img.shields.io/badge/architecture-multi--harness-blue)](skills/configure-harness/)
 [![Philosophy](https://img.shields.io/badge/context-governance-purple)](skills/configure-harness/PHILOSOPHY.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
@@ -47,19 +47,18 @@ $$\text{In-file Steps (执行步骤)} \longrightarrow \text{In-file Reference (�
 
 ## 🗂️ 核心技能矩阵 (Skills Matrix)
 
-仓库内现行沉淀 **27 项工程技能**（其中 14 项列入跨工作区共享名单 [`shared-skills.txt`](shared-skills.txt)），全部经过 [`tools/check.py`](tools/check.py) 的严格类型与契约校验：
+仓库内现行沉淀 **24 项工程技能**（其中 14 项列入跨工作区共享名单 [`shared-skills.txt`](shared-skills.txt)），全部经过 [`tools/check.py`](tools/check.py) 的严格类型与契约校验：
 
 ### 🏗️ 架构设计与领域建模 (Architecture & Domain)
 - [`domain-modeling`](skills/domain-modeling/)：将模糊概念晶体化为领域词汇表（`CONTEXT.md`）与架构决策记录（`ADR`），杜绝隐式术语漂移；
 - [`codebase-design`](skills/codebase-design/)：遵循 John Ousterhout 深度模块理念，设计深接口、强内聚接缝与可维护代码边界；
 - [`improve-codebase-architecture`](skills/improve-codebase-architecture/)：代码坏味道识别、重构手法建议与设计演进；
-- [`to-spec`](skills/to-spec/) / [`to-tickets`](skills/to-tickets/)：需求严密形式化，将自然语言诉求拆解为原子化、带验收断言的工程工单。
+- [`to-tickets`](skills/to-tickets/)：将计划、规格或对话拆解为带验收条件和阻塞关系的工程工单。
 
 ### 🛡️ 质量保障与防御性研发 (Quality & Resilience)
 - [`code-review`](skills/code-review/)：沿“工程标准（Standards）”与“需求契约（Spec）”双轴对变更做高可信静态审查；
 - [`tdd`](skills/tdd/)：红-绿-重构循环，测试先行，以行为断言驱动高质量代码实现；
 - [`grilling`](skills/grilling/) / [`grill-me`](skills/grill-me/)：对架构方案、复杂重构与重大决策开展高强度的对抗性拷问，挖掘隐藏盲区；
-- [`prototype`](skills/prototype/)：抛弃型原型探索，用最低成本验证状态模型与交互逻辑。
 
 ### ⚙️ Harness 治理与 Agent 研发 (Harness & Metaprogramming)
 - [`configure-harness`](skills/configure-harness/)：多平台 Harness 运行时权限、常驻负载与剪裁治理；
@@ -70,7 +69,7 @@ $$\text{In-file Steps (执行步骤)} \longrightarrow \text{In-file Reference (�
 ### 🔍 调研与上下文导航 (Research & Navigation)
 - [`research`](skills/research/)：针对高信度一手信息源（官方文档、RFC、源码）开展深度技术研判，输出落盘报告；
 - [`find-docs`](skills/find-docs/)：优先对接官方权威 SDK、CLI 与云服务文档库，阻断虚假第三方 API 幻觉；
-- [`handoff`](skills/handoff/) / [`wayfinder`](skills/wayfinder/)：复杂跨轮次会话上下文交接与复杂代码库地标导航。
+- [`handoff`](skills/handoff/)：跨轮次会话上下文交接。
 
 ---
 
