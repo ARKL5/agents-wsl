@@ -19,6 +19,9 @@
 | 扩展包 | 仅使用 FFF、`pi-web-access`、`pi-subagents`，均不固定版本；本地扩展另行维护 |
 | FFF | `@ff-labs/pi-fff`；覆盖内置搜索，关闭家目录扫描，保持 `PI_FFF_MULTIGREP` 未设置 |
 | MCP | 默认不安装，需要时再安装 |
+| 子代理工具 | `disabledFeatures` 固定为全部 15 组，含 `workflow-scripts`。`scheduledRuns.enabled` 为 `false`。模型只用单个 `agent`/`task`、`tasks` 和 `chain`，不写 workflow 脚本，也不创建定时任务 |
+| 工具启用 | `pi-subagents` 和 `pi-web-access` 的 `toolActivation` 固定为 `eager`。不使用 `subagents_enable` 和 `web_enable`，支持渐进式披露的模型也从第一轮带上完整 schema |
+| `bg_wait` | 本地扩展 `~/.pi/agent/extensions/hide-bg-wait.ts` 用 `prepareLoadout` 隐藏它的声明。工具仍注册，模型请求里不带。不要改 `pi-subagents` 的安装文件，也不要再注册同名工具 |
 
 ## 维护边界
 
