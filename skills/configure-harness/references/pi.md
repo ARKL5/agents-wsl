@@ -21,7 +21,7 @@
 | MCP | 默认不安装，需要时再安装 |
 | 子代理工具 | `disabledFeatures` 固定为全部 15 组，含 `workflow-scripts`。`scheduledRuns.enabled` 为 `false`。模型只用单个 `agent`/`task`、`tasks` 和 `chain`，不写 workflow 脚本，也不创建定时任务 |
 | 工具启用 | `pi-subagents` 和 `pi-web-access` 的 `toolActivation` 固定为 `eager`。不使用 `subagents_enable` 和 `web_enable`，支持渐进式披露的模型也从第一轮带上完整 schema |
-| `bg_wait` | 本地扩展 `~/.pi/agent/extensions/hide-bg-wait.ts` 用 `prepareLoadout` 隐藏它的声明。工具仍注册，模型请求里不带。不要改 `pi-subagents` 的安装文件，也不要再注册同名工具 |
+| 请求里的说明 | 同一本地扩展用 `prepareLoadout` 隐藏 `bg_wait` 的声明，并替换 `subagent` 和 `web_search` 的工具说明。参数 schema 仍由两个包生成。不要改安装文件，不要用 `toolDescriptionMode: "custom"`，也不要在请求里再改参数 |
 
 ## 维护边界
 
