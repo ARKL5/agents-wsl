@@ -6,4 +6,4 @@ disable-model-invocation: true
 
 Generate an SVG of a pelican riding a bicycle.
 
-写入 `/tmp/pelican.svg`。
+保存到 `/tmp/pelican-<YYYYMMDD-HHMMSS>.svg`。时间戳取写入当时的本地时间，精确到秒。
