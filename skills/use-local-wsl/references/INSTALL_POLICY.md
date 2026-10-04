@@ -1,6 +1,6 @@
 # Install policy
 
-谁管什么、装法和白名单。Windows 与 WSL 共用的 uv、mise、pnpm、npm 白名单、不预装 Java 以本文件为准。版本与是否已装：[`../scripts/query.sh`](../scripts/query.sh) `python` / `node` / `tools`。缺的已声明运行时在该项目里 `uv python install` 或 `mise install`。
+谁管什么、装法和白名单。Windows 与 WSL 共用的 uv、mise、pnpm、不预装 Java 以本文件为准。npm 白名单按侧分开，见 Node。版本与是否已装：[`../scripts/query.sh`](../scripts/query.sh) `python` / `node` / `tools`。缺的已声明运行时在该项目里 `uv python install` 或 `mise install`。
 
 ## 谁管什么
 
@@ -27,9 +27,9 @@ Python 只由 uv 管理。系统 `/usr/bin/python3` 只承载发行版包。
 - 用户级默认是 LTS 线（`mise latest node@lts`），不是 Current。
 - 新项目默认 pnpm；版本权威是 `packageManager`。Corepack 保持未 enable。
 - `.nvmrc` / `.node-version` 由 mise 读取，原样留给已有项目。
-- 全局 npm **只许** `pi`（`@earendil-works/pi-coding-agent`）和 `opencli`（`@jackwener/opencli`）。随 Node 的 `npm` / `corepack` 二进制保留。
-- `pi`：`npm install -g --ignore-scripts`；更新 `pi update --self`。
-- `opencli`：`npm install -g --allow-scripts=@jackwener/opencli`（npm 11 默认拦住脚本）。
+- WSL 全局 npm 只许 `pi`（`@earendil-works/pi-coding-agent`）和 `opencli`（`@jackwener/opencli`）。Windows 全局 npm 只许 `opencli`。随 Node 的 `npm` / `corepack` 二进制保留。
+- `pi` 只在 WSL：`npm install -g --ignore-scripts`；更新 `pi update --self`。
+- `opencli` 两侧都可以：`npm install -g --allow-scripts=@jackwener/opencli`（npm 11 默认拦住脚本）。
 
 ## Agent CLIs（有官方二进制才换）
 
