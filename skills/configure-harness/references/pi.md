@@ -21,7 +21,7 @@
 | MCP | 默认不安装，需要时再安装 |
 | 子代理工具 | `disabledFeatures` 固定为全部 15 组，含 `workflow-scripts`。`scheduledRuns.enabled` 为 `false`。模型只用单个 `agent`/`task`、`tasks` 和 `chain`，不写 workflow 脚本，也不创建定时任务 |
 | 工具启用 | `pi-web-access` 的 `toolActivation` 固定为 `eager`，不使用 `web_enable`。`pi-subagents` 为 `dynamic`：新会话不带 `subagent`。`subagents_enable` 不进模型请求。`subagent_supervisor` 也先不进，直到 `/subagent-on` 打开 `subagent`，两者出现在同一次请求。打开后的下一次请求接受提示缓存失效。已经带着它的旧会话保持原状 |
-| 请求里的说明 | 同一本地扩展用 `prepareLoadout` 隐藏 `bg_wait` 和 `subagents_enable` 的声明，并替换 `subagent` 和 `web_search` 的工具说明。参数 schema 仍由两个包生成。不要改安装文件，不要用 `toolDescriptionMode: "custom"`，也不要在请求里再改参数 |
+| 请求里的说明 | 同一本地扩展用 `prepareLoadout` 隐藏 `bg_wait` 和 `subagents_enable` 的声明，并替换 `subagent`、`subagent_supervisor` 和 `web_search` 的工具说明。监督说明只区分阻塞提问和运行查询。参数 schema 仍由两个包生成。不要改安装文件，不要用 `toolDescriptionMode: "custom"`，也不要在请求里再改参数 |
 
 ## 维护边界
 
