@@ -1,6 +1,6 @@
 # Install policy
 
-谁管什么、装法和白名单。Windows 与 WSL 共用的 uv、mise、pnpm、不预装 Java 以本文件为准。npm 白名单按侧分开，见 Node。版本与是否已装：[`../scripts/query.sh`](../scripts/query.sh) `python` / `node` / `tools`。缺的已声明运行时在该项目里 `uv python install` 或 `mise install`。
+谁管什么、装法和白名单。Windows 与 WSL 共用的 uv、mise、pnpm、不预装 Java 以本文件为准。pnpm 全局白名单见 Node。版本与是否已装：[`../scripts/query.sh`](../scripts/query.sh) `python` / `node` / `tools`。缺的已声明运行时在该项目里 `uv python install` 或 `mise install`。
 
 ## 谁管什么
 
@@ -9,32 +9,32 @@
 | Python 运行时、项目环境、锁文件 | `uv` | 项目 `.venv` / `uv.lock` / `.python-version` |
 | 独立 Python CLI | `uv tool` | `~/.local/bin` |
 | Node 与其他非 Python 运行时 | `mise` | `~/.config/mise/config.toml` |
-| 新 Node 项目的包管理器版本 | `package.json` 的 `packageManager`（mise 读取） | 项目内 |
+| Node 项目的包管理器版本 | `package.json` 的 `packageManager`（mise 读取） | 项目内 |
 | 项目构建/测试/格式化 | 项目依赖 | 该项目的锁文件 |
-| 用户级 Node CLI（白名单） | 当前 mise Node 上的 `npm -g` | 随该 Node 前缀 |
-| 有官方二进制的 agent CLI | 各自官方安装器 | 下表 |
+| 用户级 Node CLI（白名单） | 当前 mise Node 上的 `pnpm -g` | `~/.local/bin` |
+| 有官方安装器的 agent CLI | 各自官方安装器 | 下表 |
 | 系统组件、编译工具链、原生库 | apt | 发行版 |
-| 临时一次性命令 | `npx` / `uvx` / `mise exec` | 用完即走 |
+| 临时一次性命令 | `pnpm dlx` / `uvx` / `mise exec` | 用完即走 |
 
 mise `auto_install` 与 uv `python-downloads` 以本机配置为准（`query.sh` 现查）。
 
 Python 只由 uv 管理。系统 `/usr/bin/python3` 只承载发行版包。
 
-已有项目保留原工具链和锁文件。
+Node 项目的包管理器是 pnpm，锁文件是 `pnpm-lock.yaml`。非 Node 的已有工具链和锁文件保留。
 
 ## Node
 
 - 用户级默认是 LTS 线（`mise latest node@lts`），不是 Current。
-- 新项目默认 pnpm；版本权威是 `packageManager`。Corepack 保持未 enable。
+- 版本权威是 `package.json` 的 `packageManager`（mise 读取）。Corepack 保持未 enable。
 - `.nvmrc` / `.node-version` 由 mise 读取，原样留给已有项目。
-- WSL 全局 npm 只许 `pi`（`@earendil-works/pi-coding-agent`）和 `opencli`（`@jackwener/opencli`）。Windows 全局 npm 只许 `opencli`。随 Node 的 `npm` / `corepack` 二进制保留。
-- `pi` 只在 WSL：`npm install -g --ignore-scripts`；更新 `pi update --self`。
-- `opencli` 两侧都可以：`npm install -g --allow-scripts=@jackwener/opencli`（npm 11 默认拦住脚本）。
+- 用户级 Node CLI 用 `pnpm -g`。`pnpm config set -g globalBinDir ~/.local/bin`，全局 bin 在 `~/.local/bin`。WSL 与 Windows 的全局 pnpm 只许 `opencli`（`@jackwener/opencli`）：`pnpm add -g @jackwener/opencli`，再 `pnpm approve-builds -g @jackwener/opencli`。
+- 随 Node 的 `npm` / `corepack` 留在该 Node 前缀里。这个前缀不再装别的全局包。
 
-## Agent CLIs（有官方二进制才换）
+## Agent CLIs（有官方安装器才换）
 
 | 命令 | 装法 | 落点 |
 | --- | --- | --- |
+| `pi` | 只在 WSL。`curl -fsSL https://pi.dev/install.sh \| sh`；更新 `pi update` | `~/.pi/agent`，入口 `~/.local/bin/pi` |
 | `claude` | `curl -fsSL https://claude.ai/install.sh \| bash` | `~/.local/share/claude` |
 | `opencode` | `https://opencode.ai/v2/install`，`--no-modify-path`；更新 `opencode upgrade --method curl` | `~/.opencode/bin` |
 | `grok` / `codex` | 各自官方安装器 | 现查 |

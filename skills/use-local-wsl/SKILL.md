@@ -1,6 +1,6 @@
 ---
 name: use-local-wsl
-description: Use when a task on this WSL machine touches Windows paths, wslpath, or .exe; wslview; or uv, mise, Node, pnpm, agent CLIs, or global npm.
+description: Use when a task on this WSL machine touches Windows paths, wslpath, or .exe; wslview; or uv, mise, Node, pnpm, or agent CLIs.
 ---
 
 # Use Local WSL

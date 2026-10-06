@@ -16,9 +16,10 @@ NVM_DIR="${NVM_DIR:-${HOME_DIR}/.nvm}"
 PS="${PS:-/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe}"
 WSL_EXE="${WSL_EXE:-/mnt/c/Windows/System32/wsl.exe}"
 
-# INSTALL_POLICY global-npm allowlist
-NPM_ALLOW='@earendil-works/pi-coding-agent @jackwener/opencli pi opencli'
+# INSTALL_POLICY: Node prefix keeps npm/corepack. User CLIs are pnpm globals.
+NPM_ALLOW=''
 NPM_KEEP='npm corepack'
+PNPM_ALLOW='@jackwener/opencli opencli'
 
 wsl_printf_kv() {
   printf '%s=%s\n' "$1" "$2"
@@ -302,6 +303,47 @@ wsl_topic_node() {
     fi
   else
     wsl_status 'npm-global' missing 'npm-not-in-path'
+  fi
+  echo '## pnpm-global'
+  if command -v pnpm >/dev/null 2>&1; then
+    BINDIR="$(pnpm bin -g 2>/dev/null || true)"
+    wsl_printf_kv 'pnpm_global_bin' "${BINDIR:-fail}"
+    if [ "$BINDIR" = "${HOME_DIR}/.local/bin" ]; then
+      wsl_status 'pnpm-global-bin' ok 'local-bin'
+    else
+      wsl_status 'pnpm-global-bin' fail 'not-local-bin'
+    fi
+    JSON="$(pnpm list -g --depth=0 --json 2>/dev/null || true)"
+    if [ -z "$JSON" ]; then
+      wsl_status 'pnpm-global' fail 'pnpm-list-failed'
+    else
+      EXTRA_LIST="$(printf '%s' "$JSON" | PNPM_ALLOW="$PNPM_ALLOW" python3 -c '
+import json, os, sys
+allow = set(os.environ.get("PNPM_ALLOW", "").split())
+try:
+    data = json.load(sys.stdin)
+except json.JSONDecodeError:
+    sys.exit(1)
+items = data if isinstance(data, list) else [data]
+for item in items:
+    for name in (item.get("dependencies") or {}):
+        short = name.rsplit("/", 1)[-1]
+        if name not in allow and short not in allow:
+            print(name)
+')"
+      if [ "$?" -ne 0 ]; then
+        wsl_status 'pnpm-global' fail 'pnpm-list-parse-failed'
+      elif [ -n "$EXTRA_LIST" ]; then
+        echo 'pnpm_extras:'
+        printf '%s\n' "$EXTRA_LIST"
+        wsl_status 'pnpm-global' fail 'extras-present'
+      else
+        wsl_printf_kv 'pnpm_extras' none
+        wsl_status 'pnpm-global' ok 'allowlist-only'
+      fi
+    fi
+  else
+    wsl_status 'pnpm-global' missing 'pnpm-not-in-path'
   fi
 }
 
