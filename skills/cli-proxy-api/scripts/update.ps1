@@ -11,6 +11,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+if ($Version -and $Target -eq 'all') {
+    throw 'Version requires Target to be cpa or keeper.'
+}
+
 # Discover local mixed proxy for GitHub downloads.
 if (-not $env:HTTP_PROXY -and -not $env:ALL_PROXY) {
     $candidates = @(7897, 7890, 10808, 10809, 20171, 7893)
@@ -213,3 +217,7 @@ foreach ($key in $results.Keys) {
     }
 }
 Write-Host '================================================' -ForegroundColor Cyan
+
+$failed = @($results.Values | Where-Object { $_.Status -notin @('Updated', 'AlreadyLatest') })
+if ($failed.Count -gt 0) { exit 1 }
+exit 0

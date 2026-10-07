@@ -19,9 +19,21 @@ function Line([string]$Name, [string]$Value) {
 
 function Get-HttpCode([string]$Url, [string]$Auth) {
     $curlArgs = @('--silent', '--output', 'NUL', '--write-out', '%{http_code}', '--max-time', '5', '--connect-timeout', '3')
-    if ($Auth) { $curlArgs += @('-H', "Authorization: Bearer $Auth") }
-    $curlArgs += $Url
-    $code = & curl.exe @curlArgs 2>$null
+    if ($Auth) {
+        $config = @(
+            'silent',
+            'output = NUL',
+            'write-out = %{http_code}',
+            'max-time = 5',
+            'connect-timeout = 3',
+            ('header = Authorization: Bearer {0}' -f $Auth),
+            ('url = {0}' -f $Url)
+        ) -join "`n"
+        $code = $config | & curl.exe --config - 2>$null
+    } else {
+        $curlArgs += $Url
+        $code = & curl.exe @curlArgs 2>$null
+    }
     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($code)) { return '000' }
     return [string]$code
 }
