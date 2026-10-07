@@ -45,6 +45,19 @@ def ref_has_path(cwd: Path, ref: str, path: str) -> bool:
     return rc == 0
 
 
+def ensure_clean_paths(cwd: Path, paths: list[str]) -> None:
+    """Do not let overlay overwrite local edits in the paths it owns."""
+    if not paths:
+        return
+    rc, out, err = git(cwd, "status", "--porcelain=v1", "--untracked-files=all", "--", *paths)
+    if rc != 0:
+        raise SystemExit(err or out or f"git status failed in {cwd}")
+    if out:
+        raise SystemExit(
+            f"sync aborted in {cwd}: target paths have local changes; review or commit them first:\n{out}"
+        )
+
+
 def overlay(target_repo: Path, source_ref: str, commit_msg: str = "sync: shared set from wsl/main") -> None:
     new_names = shared_names(target_repo, source_ref)
     if not new_names:
@@ -65,17 +78,16 @@ def overlay(target_repo: Path, source_ref: str, commit_msg: str = "sync: shared 
     # 4. Remove active skills and dropped skills before checkout
     # tools/ stays in working tree during rm to avoid breaking running script
     rm_paths = [*(f"skills/{name}" for name in dropped_skills), *[p for p in checkout_paths if p != "tools"]]
+    ensure_clean_paths(target_repo, sorted(set(rm_paths + checkout_paths)))
     if rm_paths:
         rc, out, err = git(target_repo, "rm", "-rf", "--ignore-unmatch", "--", *rm_paths)
         if rc != 0:
-            git(target_repo, "reset", "--hard", "HEAD")
-            raise SystemExit(f"git rm failed in {target_repo}, reset to HEAD:\n{err or out}")
+            raise SystemExit(f"git rm failed in {target_repo}; local state was preserved:\n{err or out}")
 
     # 5. Check out clean copies from source_ref
     rc, out, err = git(target_repo, "checkout", source_ref, "--", *checkout_paths)
     if rc != 0:
-        git(target_repo, "reset", "--hard", "HEAD")
-        raise SystemExit(f"overlay failed in {target_repo}, reset to HEAD:\n{err or out}")
+        raise SystemExit(f"overlay failed in {target_repo}; local state was preserved:\n{err or out}")
 
     # 6. Check if any previously tracked protocol files were deleted in source_ref
     for old_proto in ("CONTEXT.md", "docs", "docs/adr"):

@@ -198,6 +198,12 @@ if printf '%s' "$sum" | grep -Eqi 'api[_-]?key=|token=[A-Za-z0-9]{8,}'; then
 else
   pass 'no secret assignment'
 fi
+profile_out="$(OPENCLI_PROFILE='query-test-profile-id' /usr/bin/bash "$QUERY" shell 2>/dev/null || true)"
+if printf '%s' "$profile_out" | grep -q 'query-test-profile-id'; then
+  fail 'OPENCLI_PROFILE value leaked'
+else
+  pass 'OPENCLI_PROFILE value redacted'
+fi
 
 if [ "$FAILS" -ne 0 ]; then
   printf 'FAILED %s tests\n' "$FAILS" >&2

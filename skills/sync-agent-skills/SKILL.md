@@ -6,31 +6,31 @@ disable-model-invocation: true
 
 # Sync agent skills
 
-本侧工作树是 `~/.agents`。点名 skill、优化或改 → **改**；装外部 skill → **装**；同步或拉仓 → **同步**。多条都点则按 改 → 装 → 同步。
+本 skill 只在用户点名修改、安装或同步 agent skills 时使用。按 **改 → 装 → 同步** 处理同一请求中的多个动作。
 
-共享名单：`shared-skills.txt`。共享 skill 来源是 WSL 工作树。各家从 `~/.agents/skills` 加载；Claude Code 例外，走 `~/.claude/skills/<name>` 链接，由 **同步** 维护。
+共享名单由 `shared-skills.txt` 声明，WSL 工作树是来源。各 agent 从 `~/.agents/skills` 加载；Claude Code 的 `~/.claude/skills/<name>` 链接由 **同步** 维护。
 
 ## 改
 
-在本侧 `~/.agents` 改点名的 skill。先列出工作区已有改动，留下无关项。共享 skill 两侧工作树写同一份。
+在本侧 `~/.agents` 修改点名的 skill。先查看已有改动并保留无关项；共享 skill 由同步流程传播到另一侧。
 
-提交、推送仅当用户点名。共享 skill 一次提交只含一个 `skills/<skill>/**` 与必要协议文件，说明 `shared(<skill>): ...`；平台专属走自己的提交。
+提交或推送仅在用户点名时进行。共享 skill 的提交只包含该 skill 与必要协议文件，提交信息使用 `shared(<skill>): ...`；平台专属 skill 使用本侧提交。
 
 写盘后跑 `uv run tools/check.py`。
 
-完成：点名 skill 已改；共享 skill 则两侧已是同一份；校验已跑；无关脏文件仍在则列出。
+完成：点名 skill 已改，校验已通过；共享 skill 已同步到两侧。列出仍存在的无关脏文件。
 
 ## 装
 
 点名来源和 skill 名。未点名先问。点名项目则落到该项目 `.agents/skills/<name>/`；否则 `~/.agents/skills/<name>/`。
 
-1. **列包与基线。** `npx skills add <source> -l`。记录选定落点及安装器可能写入位置的既有同名目录和链接；链接同时记录目标。完成：要装的名字在列表里，安装前基线已记录。
-2. **写入。** 本侧：在 `~/.agents` 下 `npx skills add <source> --skill <name> -g -y`。项目：在该项目根下 `npx skills add <source> --skill <name> -y`。只装点名那一个。`.skill-lock.json` 随安装更新。完成：点名 skill 已写入选定落点。
-3. **清理。** 对照基线，只清理可确认由本次安装新生成、位于选定落点之外的冗余副本或链接。删除链接前核对目标，只删除链接本身；**同步** 维护的 Claude Code 链接保留。既有内容或来源不明的内容保持原样；需要迁移或删除时，列出具体路径并取得用户确认。完成：本次新增冗余项已清理，保留项已记录。
-4. **本侧收尾。** 仅本侧：默认不进 `shared-skills.txt`，用户点名共享才加（准入：可移植且对侧会用）；提交规则同 **改**；跑 `uv run tools/check.py`。项目跳过。完成：本侧已校验，或本步已跳过。
+1. **列包与基线。** 运行 `npx skills add <source> -l`；记录选定落点、既有同名目录和链接目标。
+2. **写入。** 本侧在 `~/.agents` 下运行 `npx skills add <source> --skill <name> -g -y`；项目在项目根运行不带 `-g` 的命令。只安装点名 skill，并保留 `.skill-lock.json` 的更新。
+3. **清理。** 仅删除能由基线确认是本次安装新生成、且位于选定落点之外的副本或链接。删除链接前核对目标；同步维护的 Claude Code 链接、既有内容和来源不明内容均保留。
+4. **收尾。** 本侧安装默认不加入 `shared-skills.txt`；只有用户点名共享且 skill 可移植、对侧确实使用时才加入。运行 `uv run tools/check.py`；项目安装跳过本步。
 
-完成：点名 skill 在选定落点；本侧则校验已跑；无关脏文件仍在则列出。
+完成：点名 skill 位于选定落点，新增冗余已处理，校验已通过；列出仍存在的无关脏文件。
 
 ## 同步
 
-在本侧 `~/.agents` 跑 `uv run tools/sync.py`。完成：以脚本输出为准。
+在本侧 `~/.agents` 运行 `uv run tools/sync.py`。完成：以脚本输出和最终校验为准。

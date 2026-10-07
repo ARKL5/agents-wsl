@@ -23,4 +23,4 @@ Use `diff` when the point is a change to an existing structure. Show the whole b
 
 ## HTML
 
-Write one focused diagram, infographic, or short slide deck to `/tmp/show-me-<slug>.html`. Use real labels and data; support desktop and mobile. Open it using the browser-opening conventions in `use-local-wsl`, and report the absolute path.
+Write one focused diagram, infographic, or short slide deck to `/tmp/show-me-<slug>.html`. Use real labels and data; support desktop and mobile. Open it with `wslview`, and report the absolute path.

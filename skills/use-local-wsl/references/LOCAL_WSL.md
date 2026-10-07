@@ -36,6 +36,6 @@
 
 ## Applying changes
 
-改 `.wslconfig` 或 boot/interop 前先备份该文件。完整生效通常要 distro 重启；在 WSL 内跑的 agent **不得**自行 `wsl --shutdown`，除非用户明确授权中断。
+改 `.wslconfig` 或 boot/interop 后，完整生效通常要 distro 重启；在 WSL 内跑的 agent **不得**自行 `wsl --shutdown`，除非用户明确授权中断。
 
 点名压缩虚拟盘：用户授权中断后，在 Windows 上停发行版再 `diskpart compact` 那个 `ext4.vhdx`。不要压 swap VHDX。服务停在 Stopping 时重启 `WSLService`，不要 unregister。

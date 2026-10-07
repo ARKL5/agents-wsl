@@ -1,6 +1,6 @@
 # Local Windows Interop
 
-从 WSL 调 Windows 路径和 `.exe`。身份在 skill 的 Always。Windows agent 进 Linux 的命令见 `use-local-windows` 的 `WSL_INTEROP.md`。
+从 WSL 调 Windows 路径和 `.exe`。身份在 skill 的 Always。
 
 ## Filesystems
 

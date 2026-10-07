@@ -177,9 +177,6 @@ wsl_topic_shell() {
   wsl_printf_kv 'SSH_AUTH_SOCK_set' "$([ -n "${SSH_AUTH_SOCK:-}" ] && echo yes || echo no)"
   wsl_printf_kv 'BROWSER_set' "$([ -n "${BROWSER:-}" ] && echo yes || echo no)"
   wsl_printf_kv 'OPENCLI_PROFILE_set' "$([ -n "${OPENCLI_PROFILE:-}" ] && echo yes || echo no)"
-  if [ -n "${OPENCLI_PROFILE:-}" ]; then
-    wsl_printf_kv 'OPENCLI_PROFILE' "$OPENCLI_PROFILE"
-  fi
   if [ -n "${BROWSER:-}" ]; then
     wsl_printf_kv 'BROWSER' "$BROWSER"
   fi
@@ -616,4 +613,3 @@ wsl_topic_summary() {
   echo
   echo '## wsl'; wsl_topic_wsl
 }
-
