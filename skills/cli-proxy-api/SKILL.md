@@ -1,6 +1,6 @@
 ---
 name: cli-proxy-api
-description: 接入或更新本机 CLIProxyAPI：客户端接入，或换 CPA / Keeper 二进制。
+description: 在本机通过 CLIProxyAPI 接入用户点名的客户端、Agent 或项目，或更新 CLIProxyAPI / CPAUsageKeeper。
 disable-model-invocation: true
 ---
 
