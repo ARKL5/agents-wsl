@@ -9,7 +9,6 @@ handoff
 research
 setup-agent-workspace
 sync-agent-skills
-teach
 to-spec
 wait-what
 writing-for-agents
