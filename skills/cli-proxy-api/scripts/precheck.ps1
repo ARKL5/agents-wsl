@@ -17,17 +17,26 @@ function Line([string]$Name, [string]$Value) {
     Write-Output ('{0}={1}' -f $Name, $Value)
 }
 
+function ConvertTo-CurlConfigParam([string]$Value) {
+    if ($null -eq $Value) { $Value = '' }
+    # Curl config splits unquoted parameters on whitespace. Quote the value and
+    # escape the sequences curl recognizes inside double quotes.
+    $escaped = $Value.Replace('\', '\\').Replace('"', '\"').Replace("`r", '\r').Replace("`n", '\n').Replace("`t", '\t')
+    return '"' + $escaped + '"'
+}
+
 function Get-HttpCode([string]$Url, [string]$Auth) {
     $curlArgs = @('--silent', '--output', 'NUL', '--write-out', '%{http_code}', '--max-time', '5', '--connect-timeout', '3')
     if ($Auth) {
+        $header = ConvertTo-CurlConfigParam ('Authorization: Bearer ' + $Auth)
         $config = @(
             'silent',
             'output = NUL',
             'write-out = %{http_code}',
             'max-time = 5',
             'connect-timeout = 3',
-            ('header = Authorization: Bearer {0}' -f $Auth),
-            ('url = {0}' -f $Url)
+            ('header = {0}' -f $header),
+            ('url = {0}' -f (ConvertTo-CurlConfigParam $Url))
         ) -join "`n"
         $code = $config | & curl.exe --config - 2>$null
     } else {
