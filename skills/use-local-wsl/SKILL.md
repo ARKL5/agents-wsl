@@ -1,6 +1,6 @@
 ---
 name: use-local-wsl
-description: Use when a task on this WSL machine touches Windows paths, wslpath, or .exe; wslview; or uv, mise, Node, pnpm, or agent CLIs.
+description: Use when a task on this WSL machine touches Windows paths, wslpath, or .exe; wslview; uv, mise, Node, pnpm, or agent CLIs; or managed apt packages Docker and google-chrome-stable.
 ---
 
 # Use Local WSL
@@ -21,7 +21,7 @@ Done when each in-scope everyday file is read and its Query has been run. 点名
 
 - Linux work and repos in WSL; Windows tools via absolute `/mnt/c/.../*.exe` and `wslpath`.
 - Windows 用户 `ARK\38993`，家目录 `C:\Users\38993`。本侧用户 `ark`，家目录 `/home/ark`，代码根 `/home/ark/CODE`。发行版 Ubuntu（WSL 2）。
-- 升级和巡检只覆盖这里的命令行工具和运行时。通道以外的软件，含 Windows 上的图形应用，用户自己装、自己升级。
+- 升级和巡检覆盖 INSTALL_POLICY 声明的通道，含其中的 apt 包。通道以外的软件，含 Windows 上的图形应用，用户自己装、自己升级。
 - Open a URL or local file for the user with `wslview`.
 - Skills 本侧工作树 `/home/ark/.agents`，Windows 工作树 `/mnt/c/Users/38993/.agents`。各 agent 从 `/home/ark/.agents/skills` 加载 skill。改这棵树走 `sync-agent-skills`。
 - WSL system changes stay within the user's requested scope. Get explicit authorization before interrupting or restarting the distro.

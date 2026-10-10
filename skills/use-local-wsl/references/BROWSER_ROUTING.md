@@ -20,7 +20,7 @@ Interactive launcher: `/usr/local/bin/wsl-chrome` (sources `~/.config/proxy-env.
 | HTTP, HTTPS, HTML mime default | `wsl-google-chrome.desktop` |
 | Chrome profile | `~/.config/google-chrome/Default`, name `ARK` |
 | Sync | Enabled; extension sync disabled |
-| Package updates | Google APT source `/etc/apt/sources.list.d/google-chrome.sources` |
+| Package updates | 纳入升级范围。Google APT source `/etc/apt/sources.list.d/google-chrome.sources` |
 
 `$BROWSER` and xdg mime stay WSL Chrome for interactive shell/desktop. 点名 Windows Chrome 时用 `/usr/local/bin/windows-chrome`，本地文件先 `wslpath -w`。
 

@@ -51,6 +51,10 @@ Node 项目的包管理器是 pnpm，锁文件是 `pnpm-lock.yaml`。非 Node �
 
 原生 Docker Engine（apt）。
 
+## Chrome
+
+`google-chrome-stable`（apt，Google 源 `/etc/apt/sources.list.d/google-chrome.sources`）。启动器仍是 `/usr/local/bin/wsl-chrome`。
+
 ## 卫生
 
 - 家目录下顶层只有 `skills/` 的产品点目录：确认是安装器残留后再删。`~/.agents` 留下。

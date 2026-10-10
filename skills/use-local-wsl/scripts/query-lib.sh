@@ -535,6 +535,17 @@ wsl_topic_browser() {
   if [ -r /proc/sys/fs/binfmt_misc/WSLInterop ]; then
     wsl_printf_kv 'WSLInterop' "$(grep enabled /proc/sys/fs/binfmt_misc/WSLInterop 2>/dev/null || echo unread)"
   fi
+  echo '## chrome-package'
+  if dpkg-query -W google-chrome-stable >/dev/null 2>&1; then
+    wsl_printf_kv 'chrome_installed' "$(dpkg-query -W -f='${Version}' google-chrome-stable 2>/dev/null)"
+    chrome_candidate="$(apt-cache policy google-chrome-stable 2>/dev/null | awk '/^([[:space:]]*)(候选：|Candidate:)/ {print $2; exit}')"
+    wsl_printf_kv 'chrome_candidate' "${chrome_candidate:-unknown}"
+    wsl_status 'chrome-pkg' ok apt
+  else
+    wsl_printf_kv 'chrome_installed' missing
+    wsl_printf_kv 'chrome_candidate' missing
+    wsl_status 'chrome-pkg' missing 'package-not-installed'
+  fi
 }
 
 wsl_topic_wsl() {
