@@ -38,3 +38,5 @@ When a fetch tool reports SSRF / private IP in `198.18.0.0/15`:
 1. Confirm the same URL via curl through the discovered mixed port.
 2. Treat it as Fake-IP vs that tool's SSRF list, not as a dead proxy.
 3. Per-tool allowlist lives with the tool, not in `no_proxy`. Grok uses `web_search` (Responses API); `web_fetch` is not a repair surface.
+
+完成标准：本次核对过的层，其落点文件与 `query.sh network` 的端口一致。出现 `198.18.0.0/15` 或 SSRF 报错时，同一 URL 经该 mixed 口的 curl 结果已对照。

@@ -1,6 +1,6 @@
 ---
 name: use-local-wsl
-description: Use when a task on this WSL machine touches Windows paths, wslpath, or .exe; wslview; uv, mise, Node, pnpm, or agent CLIs; or managed apt packages Docker and google-chrome-stable.
+description: Use when work on this WSL machine crosses Windows paths, or changes uv, mise, Node, or pnpm.
 ---
 
 # Use Local WSL
@@ -11,19 +11,32 @@ Conventions live in the topic files. Live versions, ports, and paths: [`scripts/
 
 | Branch | File | Query |
 | --- | --- | --- |
-| path translation, `.exe` | [`references/WINDOWS_INTEROP.md`](references/WINDOWS_INTEROP.md) | |
+| Windows paths | [`references/WINDOWS_INTEROP.md`](references/WINDOWS_INTEROP.md) | |
 | managers, install channels, Node/Python | [`references/INSTALL_POLICY.md`](references/INSTALL_POLICY.md) | `python`, `node`, `tools` |
-| 点名才读 | `.wslconfig` / `wsl.conf`、secrets、Docker、重启 → [`references/LOCAL_WSL.md`](references/LOCAL_WSL.md)（`wsl`、`docker` 或 `shell`）；代理、Fake-IP → [`references/NETWORK_PROXY.md`](references/NETWORK_PROXY.md)（`network`）；WSL Chrome → [`references/BROWSER_ROUTING.md`](references/BROWSER_ROUTING.md)（`browser`）；WSL 环境巡检 → [`scripts/query.sh`](scripts/query.sh)（`summary` 或相关主题） | 格内注明的那一个 |
+| 升级候选或批量升级 | 本节「升级」 | 见升级节 |
+| 点名 `.wslconfig`、`wsl.conf`、重启 | [`references/LOCAL_WSL.md`](references/LOCAL_WSL.md) | `wsl` |
+| 点名 secrets | [`references/LOCAL_WSL.md`](references/LOCAL_WSL.md) | `shell` |
+| 点名 Docker | [`references/LOCAL_WSL.md`](references/LOCAL_WSL.md) | `docker` |
+| 点名代理、Fake-IP | [`references/NETWORK_PROXY.md`](references/NETWORK_PROXY.md) | `network` |
+| 点名 WSL Chrome | [`references/BROWSER_ROUTING.md`](references/BROWSER_ROUTING.md) | `browser` |
+| 点名环境合同 | [`scripts/query.sh`](scripts/query.sh) | `summary` 或相关主题 |
 
-Done when each in-scope everyday file is read and its Query has been run. 点名才读只打开被点名的那一份，并跑它注明的 query。随后遵循该文件和下面的规则。
+完成标准：本次打开的参考文档，其完成标准均已满足；升级节则满足该节自己的完成标准。点名才读只打开被点名的那一份。点名 `query.sh` 时，该行主题已跑完并按其输出汇报。
 
 ## Always
 
 - Linux work and repos in WSL; Windows tools via absolute `/mnt/c/.../*.exe` and `wslpath`.
-- Windows 用户 `ARK\38993`，家目录 `C:\Users\38993`。本侧用户 `ark`，家目录 `/home/ark`，代码根 `/home/ark/CODE`。发行版 Ubuntu（WSL 2）。
-- 升级和巡检覆盖 INSTALL_POLICY 声明的通道，含其中的 apt 包。通道以外的软件，含 Windows 上的图形应用，用户自己装、自己升级。
+- 本侧用户 `ark`，家目录 `/home/ark`，代码根 `/home/ark/CODE`。发行版 Ubuntu（WSL 2）。Windows 的用户、家目录、安装通道与图形应用见 use-local-windows。
 - Open a URL or local file for the user with `wslview`.
-- Skills 本侧工作树 `/home/ark/.agents`，Windows 工作树 `/mnt/c/Users/38993/.agents`。各 agent 从 `/home/ark/.agents/skills` 加载 skill。改这棵树走 `sync-agent-skills`。
+- 本侧 skills 工作树 `/home/ark/.agents`。各 agent 从 `/home/ark/.agents/skills` 加载 skill。改这棵树走 `sync-agent-skills`。
 - WSL system changes stay within the user's requested scope. Get explicit authorization before interrupting or restarting the distro.
+
+## 升级
+
+升级和巡检覆盖 INSTALL_POLICY 声明的通道，含其中的 apt 包。通道以外的本侧软件由用户自己管理。
+
+环境合同用 [`scripts/query.sh`](scripts/query.sh)。升级候选用 [`scripts/live-check-wsl.sh`](scripts/live-check-wsl.sh)，它不刷新 APT 索引，候选版本可能滞后。自动维护只报告 unattended-upgrades 覆盖的安全源。
+
+[`scripts/apply-wsl.sh`](scripts/apply-wsl.sh) 分两次：root 执行 APT，再以用户 `ark` 执行 mise、uv、opencli。只有用户授权覆盖整个脚本时才运行。Windows 侧的批量脚本见 use-local-windows。
 
 Finish after the command ran in the intended environment and `query.sh` (or the command's own check) confirmed state.

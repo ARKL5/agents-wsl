@@ -9,7 +9,7 @@
 - Windows: `C:\Users\38993\.wslconfig` ↔ `/mnt/c/Users/38993/.wslconfig`
 - Linux: `/etc/wsl.conf`
 
-**现行内容以文件为准**（读文件，勿背文档）。意图约定（改前先对照 live）：
+**现行内容以文件为准**。意图约定（改前先对照 live）：
 
 - `.wslconfig`：`networkingMode=mirrored`，`autoProxy=false`，`dnsTunneling=true`；memory / processors / swap 以文件为准。processors 少于本机逻辑核，留给 Windows 前台。
 - `wsl.conf`：`systemd=true`；`interop.enabled=true`，`appendWindowsPath=false`
@@ -39,3 +39,5 @@
 改 `.wslconfig` 或 boot/interop 后，完整生效通常要 distro 重启；在 WSL 内跑的 agent **不得**自行 `wsl --shutdown`，除非用户明确授权中断。
 
 点名压缩虚拟盘：用户授权中断后，在 Windows 上停发行版再 `diskpart compact` 那个 `ext4.vhdx`。不要压 swap VHDX。服务停在 Stopping 时重启 `WSLService`，不要 unregister。
+
+完成标准：本次涉及的 `.wslconfig`、`wsl.conf`、secrets 或 Docker 项，已用 `query.sh` 的 `wsl`、`shell` 或 `docker` 核对。改过的配置与查询结果一致。发行版仍在运行，除非本次已另行取得中断授权。

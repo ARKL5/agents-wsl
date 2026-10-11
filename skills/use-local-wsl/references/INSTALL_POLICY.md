@@ -60,3 +60,5 @@ Node 项目的包管理器是 pnpm，锁文件是 `pnpm-lock.yaml`。非 Node �
 - 家目录下顶层只有 `skills/` 的产品点目录：确认是安装器残留后再删。`~/.agents` 留下。
 - `/usr/local/bin` 与 `/usr/local/lib/docker/cli-plugins` 里指向已卸软件的断链删掉。
 - 用户点名清理时，可清除用户级 pip 安装树；项目 `.venv` 与 apt 管理的包分开处理。
+
+完成标准：本次安装或更换通道的工具，管理器与落点与本文件一致。新装的运行时都已在本文件声明。

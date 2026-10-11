@@ -1,6 +1,6 @@
 # Local Windows Interop
 
-从 WSL 调 Windows 路径和 `.exe`。身份在 skill 的 Always。
+从 WSL 调 Windows 路径和 `.exe`。本侧身份在 skill 的 Always。Windows 用户与家目录见 use-local-windows。
 
 ## Filesystems
 
