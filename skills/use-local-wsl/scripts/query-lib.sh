@@ -16,10 +16,10 @@ NVM_DIR="${NVM_DIR:-${HOME_DIR}/.nvm}"
 PS="${PS:-/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe}"
 WSL_EXE="${WSL_EXE:-/mnt/c/Windows/System32/wsl.exe}"
 
-# INSTALL_POLICY: Node prefix keeps npm/corepack. User CLIs are pnpm globals.
+# INSTALL_POLICY: Node prefix allows npm and optional corepack. User CLIs are pnpm globals.
 NPM_ALLOW=''
 NPM_KEEP='npm corepack'
-PNPM_ALLOW='@jackwener/opencli opencli'
+PNPM_ALLOW='@jackwener/opencli opencli agent-browser'
 
 wsl_printf_kv() {
   printf '%s=%s\n' "$1" "$2"
@@ -251,12 +251,15 @@ wsl_topic_node() {
   wsl_cmd_record node node || true
   wsl_cmd_record npm npm || true
   wsl_cmd_record pnpm pnpm || true
-  wsl_cmd_record corepack corepack || true
+  wsl_printf_kv 'corepack_required' no
   if command -v corepack >/dev/null 2>&1; then
-    # "enabled" means shims like yarn/pnpm were installed by corepack enable
+    wsl_cmd_record corepack corepack || true
     wsl_printf_kv 'corepack_present' yes
-    wsl_printf_kv 'corepack_enable' 'do-not-enable (mise selects pnpm from packageManager)'
+  else
+    wsl_printf_kv 'corepack_present' no
+    wsl_status 'corepack' ok 'absent-optional'
   fi
+  wsl_printf_kv 'corepack_enable' 'do-not-enable (mise selects pnpm from packageManager)'
   if [ -x "$MISE_BIN" ]; then
     wsl_printf_kv 'mise' "$MISE_BIN"
     wsl_printf_kv 'mise_auto_install' "$("$MISE_BIN" settings get auto_install 2>/dev/null || echo fail)"
@@ -347,7 +350,7 @@ for item in items:
 wsl_topic_tools() {
   echo 'topic=tools'
   local cmd
-  for cmd in grok claude opencode codex agy herdr pi opencli uv mise docker bun; do
+  for cmd in grok claude opencode codex agy herdr pi opencli agent-browser uv mise docker bun; do
     wsl_cmd_record "$cmd" "$cmd" || true
   done
   echo '## usr-local-bin'

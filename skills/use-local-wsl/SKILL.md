@@ -21,7 +21,7 @@ Conventions live in the topic files. Live versions, ports, and paths: [`scripts/
 | 点名 WSL Chrome | [`references/BROWSER_ROUTING.md`](references/BROWSER_ROUTING.md) | `browser` |
 | 点名环境合同 | [`scripts/query.sh`](scripts/query.sh) | `summary` 或相关主题 |
 
-完成标准：本次打开的参考文档，其完成标准均已满足；升级节则满足该节自己的完成标准。点名才读只打开被点名的那一份。点名 `query.sh` 时，该行主题已跑完并按其输出汇报。
+点名才读的分支只打开被点名的那一份。
 
 ## Always
 
@@ -39,4 +39,8 @@ Conventions live in the topic files. Live versions, ports, and paths: [`scripts/
 
 [`scripts/apply-wsl.sh`](scripts/apply-wsl.sh) 分两次：root 执行 APT，再以用户 `ark` 执行 mise、uv、opencli。只有用户授权覆盖整个脚本时才运行。Windows 侧的批量脚本见 use-local-windows。
 
-Finish after the command ran in the intended environment and `query.sh` (or the command's own check) confirmed state.
+## 完成标准
+
+- 查询：跑完所选主题并按输出汇报异常；点名 `query.sh` 时覆盖对应行的主题。
+- 变更：命令在目标环境执行，`query.sh` 或命令自带检查确认目标状态；报告异常及未验证范围。
+- 本次打开的参考文档中适用于任务的完成标准均已满足。
