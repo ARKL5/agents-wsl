@@ -28,7 +28,7 @@ Node 项目的包管理器是 pnpm，锁文件是 `pnpm-lock.yaml`。非 Node �
 - 版本权威是 `package.json` 的 `packageManager`（mise 读取）。WSL 的 pnpm 由 mise 管理；Corepack 非必需且不启用，缺失正常，随 Node 带入时无需自动卸载。Windows 的 Corepack 保持未 enable。
 - `.nvmrc` / `.node-version` 由 mise 读取，原样留给已有项目。
 - 用户级 Node CLI 用 `pnpm -g`。WSL 全局 bin 在 `~/.local/bin`：`pnpm config set -g globalBinDir ~/.local/bin`。
-- WSL 的 pnpm 全局白名单：`@jackwener/opencli`、`agent-browser`。安装用 `pnpm add -g <包名>`，安装脚本按需用 `pnpm approve-builds -g <包名>` 批准。`agent-browser` 仅在用户点名时升级，不纳入批量升级。
+- WSL 的 pnpm 全局白名单：`@jackwener/opencli`、`agent-browser`。安装和批量升级都用 `pnpm add -g <包名>`，安装脚本按需用 `pnpm approve-builds -g <包名>` 批准。
 - Windows 的 pnpm 全局白名单仍只有 `@jackwener/opencli`，装法同上。
 - Node 前缀仅允许随 Node 的 `npm` / `corepack`，不装其他全局包；WSL 无需保留 Corepack。
 

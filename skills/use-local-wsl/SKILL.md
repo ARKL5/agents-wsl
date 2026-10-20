@@ -37,7 +37,7 @@ Conventions live in the topic files. Live versions, ports, and paths: [`scripts/
 
 环境合同用 [`scripts/query.sh`](scripts/query.sh)。升级候选用 [`scripts/live-check-wsl.sh`](scripts/live-check-wsl.sh)，它不刷新 APT 索引，候选版本可能滞后。自动维护只报告 unattended-upgrades 覆盖的安全源。
 
-[`scripts/apply-wsl.sh`](scripts/apply-wsl.sh) 分两次：root 执行 APT，再以用户 `ark` 执行 mise、uv、opencli。只有用户授权覆盖整个脚本时才运行。Windows 侧的批量脚本见 use-local-windows。
+[`scripts/apply-wsl.sh`](scripts/apply-wsl.sh) 分两次：root 执行 APT，再以用户 `ark` 执行 mise、uv、opencli、agent-browser。只有用户授权覆盖整个脚本时才运行。Windows 侧的批量脚本见 use-local-windows。
 
 ## 完成标准
 

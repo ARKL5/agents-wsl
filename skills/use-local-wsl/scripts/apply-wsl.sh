@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Batch update. Run only when the whole script is authorized. Procedure: SKILL.md upgrade section.
 # Apt: root pass (`wsl.exe -d Ubuntu -u root -- bash -lc` this script).
-# User channels (mise / uv / opencli): Linux user pass (`wsl.exe -d Ubuntu -- bash -lc`).
+# User channels (mise / uv / opencli / agent-browser): Linux user pass (`wsl.exe -d Ubuntu -- bash -lc`).
 # Do not install undeclared runtimes.
 set +e
 
@@ -41,7 +41,7 @@ else
 fi
 
 if [ "$EUID_NOW" -eq 0 ]; then
-  printf 'skip user-channel tools as root; rerun as the Linux user for mise/uv/opencli\n'
+  printf 'skip user-channel tools as root; rerun as the Linux user for mise/uv/opencli/agent-browser\n'
   exit 0
 fi
 
@@ -61,12 +61,14 @@ section 'uv'
 run_or_none uv self update
 run_or_none uv tool upgrade --all
 
-section 'opencli'
+section 'pnpm global'
 if command -v pnpm >/dev/null 2>&1; then
-  pnpm add -g @jackwener/opencli
-  printf 'add-exit=%s\n' "$?"
-  pnpm approve-builds -g @jackwener/opencli
-  printf 'approve-exit=%s\n' "$?"
+  for pkg in @jackwener/opencli agent-browser; do
+    pnpm add -g "$pkg"
+    printf '%s add-exit=%s\n' "$pkg" "$?"
+    pnpm approve-builds -g "$pkg"
+    printf '%s approve-exit=%s\n' "$pkg" "$?"
+  done
 else
   printf 'none pnpm\n'
 fi
